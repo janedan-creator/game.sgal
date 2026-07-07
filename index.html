@@ -1,0 +1,2617 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Сигнал</title>
+<link rel="icon" href='data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'><rect%20x='8'%20y='24'%20width='24'%20height='10'%20fill='%23E8590C'/><rect%20x='10'%20y='14'%20width='20'%20height='10'%20fill='%23FF8A2A'/><rect%20x='16'%20y='6'%20width='8'%20height='8'%20fill='%23FFEFD0'/><rect%20x='14'%20y='17'%20width='4'%20height='4'%20fill='%236B2A00'/><rect%20x='23'%20y='17'%20width='4'%20height='4'%20fill='%236B2A00'/></svg>'>
+<meta name="description" content="Піксельна гра про вогник тривоги, якого не треба гасити. Треба почути. Сім епізодів, українською, за матеріалами дослідження (N = 314).">
+<meta name="author" content="yane.pcho">
+<meta property="og:title" content="Сигнал">
+<meta property="og:description" content="Піксельна гра про тривогу і відповіді на неї. Сім епізодів, українською.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+--night:#171C33;--panel:#262C4F;--deep:#20263F;--line:#0F1224;
+--cream:#FFF6E8;--mist:#AEB4D8;--dim:#7C84B0;
+--gold:#FFC000;--goldD:#D99C00;
+--ember:#FF8A2A;--emberD:#E8590C;--hot:#FFEFD0;
+--moss:#58C08A;--sky:#7FA8E8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--night);color:var(--cream);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center}
+#wrap{width:100%;max-width:430px;min-height:100%;display:flex;flex-direction:column;background:var(--night)}
+.px{font-family:'Press Start 2P','Courier New',monospace}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+#hud{display:flex;align-items:center;gap:8px;padding:10px 12px 8px;border-bottom:3px solid var(--line);background:var(--deep)}
+.meter{flex:1;min-width:0}
+.meter .lab{font-size:8px;letter-spacing:1px;color:var(--mist);margin-bottom:4px;white-space:nowrap}
+.blocks{display:flex;gap:2px}
+.blocks i{flex:1;height:8px;background:#343B63;border:1px solid var(--line)}
+.m-signal i.on{background:var(--ember)}
+.m-rhythm i.on{background:var(--moss)}
+.m-energy i.on{background:var(--sky)}
+.m-prog i.on{background:var(--gold)}
+#heartBtn{width:38px;height:38px;flex:none;background:var(--panel);border:3px solid var(--line);box-shadow:0 3px 0 var(--line);color:var(--cream);font-size:16px;line-height:1}
+#heartBtn:active{transform:translateY(3px);box-shadow:none}
+
+#meta{display:flex;justify-content:space-between;align-items:center;padding:8px 14px 0}
+#dayTag{font-size:9px;color:var(--gold);letter-spacing:1px}
+#cd{font-size:9px;color:var(--mist);letter-spacing:1px}
+
+#stageBox{padding:10px 12px 0}
+#stage{display:block;width:100%;border:3px solid var(--line);background:#1E2340}
+#flameW{transform-box:fill-box;transform-origin:50% 100%;transform:scale(.7);transition:transform .25s steps(3)}
+@keyframes fk{0%,49%{opacity:1}50%,100%{opacity:0}}
+.fA{animation:fk .9s steps(1) infinite}
+.fB{animation:fk .9s steps(1) -.45s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+#dialog{margin:10px 12px;background:var(--panel);border:3px solid var(--line);box-shadow:0 4px 0 var(--line);padding:12px 14px;min-height:96px;position:relative}
+#spk{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:1px;margin-bottom:8px;color:var(--mist)}
+#spk .flameDot{width:10px;height:10px;background:var(--ember);border:2px solid var(--line)}
+#spk.s{color:var(--gold)}
+#txt{font-size:15.5px;line-height:1.6;min-height:48px}
+#cue{position:absolute;right:12px;bottom:8px;color:var(--gold);animation:fk 1s steps(1) infinite}
+
+#actions{padding:4px 12px 20px;display:flex;flex-direction:column;gap:10px}
+.abtn{display:block;width:100%;text-align:left;background:var(--panel);color:var(--cream);border:3px solid var(--line);box-shadow:0 4px 0 var(--line);padding:12px 14px;font-size:15px}
+.abtn small{display:block;color:var(--mist);font-size:12.5px;margin-top:3px;font-weight:400}
+.abtn:active{transform:translateY(4px);box-shadow:none}
+.abtn.gold{background:var(--gold);color:#1E2340;font-weight:700}
+.abtn.gold small{color:#5C4700}
+.abtn[disabled]{opacity:.5;cursor:not-allowed}
+.hintline{font-size:12px;color:var(--dim);padding:0 4px}
+.task{background:#33290F;border:3px solid var(--goldD);box-shadow:0 3px 0 var(--line);padding:10px 12px;font-size:14px;line-height:1.45;color:var(--gold);font-weight:700}
+.task .px{font-size:9px;letter-spacing:1px}
+.hiddenF{display:none}
+.chip{background:var(--deep);border:3px solid var(--line);box-shadow:0 3px 0 var(--line);color:var(--cream);padding:10px 12px;font-size:14px;text-align:left}
+.chip.sel{background:var(--moss);color:#0E2B1E;font-weight:700}
+.chip[disabled]{opacity:.55;cursor:not-allowed}
+.grouplab{font-size:9px;letter-spacing:1px;color:var(--mist)}
+#preview{background:var(--deep);border:3px dashed #3A4170;padding:10px 12px;font-size:14.5px;color:var(--mist)}
+#preview b{color:var(--gold)}
+.slices{display:flex;gap:3px;height:14px;border:2px solid var(--line);background:#343B63}
+.slices i{flex:1;background:transparent}
+.slices i.on{background:var(--mist)}
+.slices i.me.on{background:var(--gold)}
+.crow{display:flex;gap:8px;align-items:stretch}
+.arw{width:46px;flex:none;background:var(--panel);border:3px solid var(--line);box-shadow:0 3px 0 var(--line);color:var(--gold);font-size:14px}
+.arw:active{transform:translateY(3px);box-shadow:none}
+.cval{flex:1;background:var(--deep);border:3px solid var(--line);padding:7px 8px;text-align:center;font-size:14px;line-height:1.35}
+.cval .lab{display:block;font-size:8px;letter-spacing:1px;color:var(--mist);margin-bottom:3px}
+.itemrow{display:flex;gap:8px}
+.itemrow .chip{flex:1;text-align:center}
+
+.screen{flex:1;display:flex;flex-direction:column}
+#intro{justify-content:center;padding:28px 22px;gap:16px;text-align:center}
+#intro .logo{font-size:24px;color:var(--cream);letter-spacing:2px}
+#intro .tag{color:var(--mist);font-size:14.5px;line-height:1.6;max-width:300px;margin:0 auto}
+#introFlame{margin:0 auto}
+.notice{background:var(--deep);border:3px solid var(--line);padding:12px 14px;font-size:13px;color:var(--mist);text-align:left;line-height:1.6}
+.field label{display:block;font-size:9px;letter-spacing:1px;color:var(--mist);margin-bottom:6px;text-align:left}
+.field input{width:100%;background:var(--panel);border:3px solid var(--line);box-shadow:inset 0 3px 0 rgba(0,0,0,.35);color:var(--cream);padding:12px;font-size:16px}
+.small{font-size:11.5px;color:var(--dim)}
+
+#mirror{padding:18px 16px 26px;gap:14px;display:none;flex-direction:column}
+#mirror h2{font-size:14px;color:var(--gold);letter-spacing:1px}
+.mcard{background:var(--panel);border:3px solid var(--line);box-shadow:0 4px 0 var(--line);padding:13px 14px;font-size:14.5px;line-height:1.65}
+.mcard .cap{font-size:9px;letter-spacing:1px;color:var(--mist);margin-bottom:6px}
+.mcard.safe{border-color:#5A2E14;background:#2E2233}
+.mcard.end{border-color:var(--goldD);background:#33290F}
+.mcard.end .big{font-size:15px;color:var(--gold);letter-spacing:1px}
+.statrow{display:flex;gap:8px}
+.statrow .st{flex:1;background:var(--deep);border:2px solid var(--line);padding:8px;text-align:center}
+.st .v{font-size:16px;color:var(--cream)}
+.st .k{font-size:8px;letter-spacing:1px;color:var(--mist);margin-top:4px}
+
+#fail{position:fixed;inset:0;background:#0A0C1A;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:26px;z-index:8;text-align:center}
+#fail .big{font-size:18px;color:var(--ember);letter-spacing:2px}
+#fail p{color:var(--mist);font-size:14.5px;line-height:1.6;max-width:300px}
+#failFlame{background:none;border:0;animation:pulse 1.6s steps(4) infinite}
+#fail .hint{font-size:9px;color:var(--gold);letter-spacing:1px;animation:fk 1.2s steps(1) infinite}
+
+#smodal{position:fixed;inset:0;background:rgba(10,12,24,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:9}
+#smodal .box{max-width:380px;width:100%;background:var(--panel);border:3px solid var(--line);box-shadow:0 6px 0 var(--line);padding:18px}
+#smodal h3{font-size:12px;color:var(--gold);letter-spacing:1px;margin-bottom:10px}
+#smodal p{font-size:14.5px;line-height:1.65;color:var(--cream);margin-bottom:10px}
+#smodal .tel{color:var(--gold);font-weight:700}
+
+#map{padding:18px 14px 26px;gap:14px;display:none;flex-direction:column}
+#map h2{font-size:14px;color:var(--gold);letter-spacing:1px}
+#mapTop{display:flex;justify-content:space-between;align-items:center}
+#codeTag{font-size:9px;color:var(--mist);letter-spacing:1px}
+#doors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.door{background:var(--panel);border:3px solid var(--line);box-shadow:0 4px 0 var(--line);padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--cream);font-size:13px;text-align:center;line-height:1.35}
+.door:active{transform:translateY(4px);box-shadow:none}
+.doorpx{width:40px;height:58px;background:#6B4A2A;border:3px solid var(--line);position:relative}
+.doorpx i{position:absolute;right:5px;top:26px;width:5px;height:5px;background:#FFC000}
+.door .st{font-size:12px;color:var(--gold)}
+.door.lock{opacity:.75}
+.door.lock .doorpx{background:#3A4170}
+#stub{background:var(--deep);border:3px solid var(--line);padding:14px;font-size:14.5px;line-height:1.6;display:none;flex-direction:column;gap:10px}
+.codecard{background:#33290F;border:3px solid var(--goldD);box-shadow:0 3px 0 var(--line);padding:12px 14px;text-align:center}
+.codecard .cd{font-size:15px;letter-spacing:2px;color:var(--gold);margin-top:6px}
+#codeRow{display:flex;gap:8px}
+#codeRow input{flex:1;min-width:0;background:var(--panel);border:3px solid var(--line);color:var(--cream);padding:12px;font-size:16px;letter-spacing:1px;text-transform:uppercase}
+#codeRow .abtn{width:auto}
+.hidden{display:none !important}
+@media (prefers-reduced-motion: reduce){
+.fA,#cue,#fail .hint{animation:none}
+.fB{display:none}
+#failFlame{animation:none}
+#flameW{transition:none}
+}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+<header id="hud" class="hidden">
+  <div class="meter m-signal"><div class="lab px">СИГНАЛ</div><div class="blocks" id="mSig"></div></div>
+  <div class="meter m-rhythm"><div class="lab px">РИТМ</div><div class="blocks" id="mRhy"></div></div>
+  <div class="meter m-energy"><div class="lab px">ЕНЕРГІЯ</div><div class="blocks" id="mEn"></div></div>
+  <div class="meter m-prog" id="mProgBox"><div class="lab px" id="epLab">МАКЕТ</div><div class="blocks" id="mPr"></div></div>
+  <button id="heartBtn" aria-label="Підтримка поруч">♥</button>
+</header>
+<div id="meta" class="hidden">
+  <span id="dayTag" class="px"></span>
+  <span id="cd" class="px"></span>
+</div>
+
+<section id="intro" class="screen">
+  <svg id="introFlame" width="72" height="72" viewBox="0 0 40 40" aria-hidden="true">
+    <g class="fA"><rect x="8" y="24" width="24" height="10" fill="#E8590C"/><rect x="10" y="14" width="20" height="10" fill="#FF8A2A"/><rect x="16" y="6" width="8" height="8" fill="#FFEFD0"/><rect x="14" y="17" width="4" height="4" fill="#6B2A00"/><rect x="23" y="17" width="4" height="4" fill="#6B2A00"/></g>
+    <g class="fB"><rect x="7" y="26" width="26" height="8" fill="#E8590C"/><rect x="12" y="16" width="18" height="10" fill="#FF8A2A"/><rect x="14" y="8" width="8" height="8" fill="#FFEFD0"/><rect x="16" y="19" width="4" height="4" fill="#6B2A00"/><rect x="24" y="19" width="4" height="4" fill="#6B2A00"/></g>
+  </svg>
+  <div class="logo px">Сигнал</div>
+  <p class="tag">про вогник тривоги, якого не треба гасити. Треба почути.</p>
+  <div class="notice">Це гра за мотивами наукового дослідження про стрес у молоді 18-29 років. Вона не ставить діагнозів і не замінює фахову допомогу. Кнопка «♥» завжди вгорі, поруч.</div>
+  <div class="field">
+    <label class="px">ХТО ТВІЙ ГЕРОЙ?</label>
+    <div class="itemrow"><button class="chip" id="nOr">Орися</button><button class="chip sel" id="nSl">Слава</button><button class="chip" id="nTa">Тарас</button></div>
+  </div>
+  <button class="abtn" id="haveCode">У мене є код</button>
+  <div id="codeRow" class="hidden"><input id="codeIn" maxlength="12" placeholder="ДІМ-#####" autocomplete="off"><button class="abtn gold" id="codeGo">Ок</button></div>
+  <p id="codeMsg" class="hintline" style="min-height:14px;margin:0"></p>
+  <button class="abtn gold" id="startBtn">Почати епізод 1</button>
+  <p class="small">Епізод 1: «Четвер близько» · 6 до 8 хвилин · є різні кінцівки</p>
+  <p class="small">гра: yane.pcho · наукова основа: дослідження N = 314</p>
+</section>
+
+<section id="game" class="screen hidden">
+  <div id="stageBox">
+  <svg id="stage" viewBox="0 0 380 200" role="img" aria-label="Піксельна кімната героя. Обстановку можна налаштувати">
+    <rect id="wall" x="0" y="0" width="380" height="150" fill="#2A3055"/>
+    <g id="stripesG" class="hiddenF">
+      <rect x="18" y="0" width="12" height="150"/><rect x="68" y="0" width="12" height="150"/>
+      <rect x="118" y="0" width="12" height="150"/><rect x="168" y="0" width="12" height="150"/>
+      <rect x="218" y="0" width="12" height="150"/><rect x="268" y="0" width="12" height="150"/>
+      <rect x="318" y="0" width="12" height="150"/><rect x="360" y="0" width="12" height="150"/>
+    </g>
+    <g id="spiralsG" class="hiddenF">
+      <g transform="translate(14,12)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(104,14)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(190,10)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(272,16)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(344,12)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(12,62)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(298,64)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(350,62)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(44,110)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+      <g transform="translate(122,108)"><rect x="0" y="0" width="12" height="3"/><rect x="9" y="3" width="3" height="9"/><rect x="0" y="9" width="9" height="3"/><rect x="0" y="3" width="3" height="3"/></g>
+    </g>
+    <rect x="26" y="34" width="64" height="64" fill="#141830"/>
+    <rect id="pane" x="32" y="40" width="52" height="52" fill="#F3C892"/>
+    <rect id="orb" x="64" y="48" width="10" height="10" fill="#FFB65C"/>
+    <rect x="32" y="63" width="52" height="6" fill="#141830"/>
+    <rect x="55" y="40" width="6" height="52" fill="#141830"/>
+    <g id="curtainG" class="hiddenF">
+      <rect x="20" y="28" width="76" height="4" fill="#3A2C1E"/>
+      <rect x="22" y="32" width="10" height="68" fill="#A85B3A"/>
+      <rect x="25" y="32" width="2" height="68" fill="#7E4227"/>
+      <rect x="84" y="32" width="10" height="68" fill="#A85B3A"/>
+      <rect x="87" y="32" width="2" height="68" fill="#7E4227"/>
+    </g>
+    <g id="pledG" class="hiddenF">
+      <rect x="30" y="90" width="30" height="8" fill="#B0653F"/>
+      <rect x="30" y="94" width="30" height="2" fill="#8E4E2F"/>
+      <rect x="34" y="86" width="22" height="4" fill="#C97B4A"/>
+    </g>
+    <g id="shelfG">
+      <rect x="98" y="64" width="44" height="6" fill="#6B4A2A"/>
+      <rect x="102" y="70" width="4" height="6" fill="#55391F"/>
+      <rect x="132" y="70" width="4" height="6" fill="#55391F"/>
+    </g>
+    <rect id="floorR" x="0" y="150" width="380" height="50" fill="#191E3A"/>
+    <g id="starsG" class="hiddenF">
+      <rect x="30" y="158" width="5" height="5"/><rect x="80" y="176" width="4" height="4"/>
+      <rect x="130" y="160" width="5" height="5"/><rect x="180" y="184" width="4" height="4"/>
+      <rect x="230" y="162" width="5" height="5"/><rect x="280" y="178" width="4" height="4"/>
+      <rect x="330" y="158" width="5" height="5"/><rect x="356" y="186" width="4" height="4"/>
+    </g>
+    <g id="pigG" class="hiddenF">
+      <rect x="104" y="48" width="28" height="16" fill="#C97B4A"/>
+      <rect x="107" y="43" width="6" height="6" fill="#C97B4A"/>
+      <rect x="132" y="52" width="5" height="7" fill="#A85B3A"/>
+      <rect x="113" y="46" width="10" height="3" fill="#6B3A1F"/>
+      <rect x="124" y="51" width="3" height="3" fill="#3A2213"/>
+    </g>
+    <g id="starWinG" class="hiddenF">
+      <rect x="55" y="26" width="4" height="12" fill="#FFC000"/>
+      <rect x="51" y="30" width="12" height="4" fill="#FFC000"/>
+      <rect x="54" y="29" width="6" height="6" fill="#FFEFD0"/>
+    </g>
+    <g id="postG" class="hiddenF">
+      <rect x="240" y="32" width="30" height="42" fill="#2E3A63"/>
+      <rect x="240" y="48" width="30" height="7" fill="#FFC000"/>
+      <rect x="244" y="38" width="20" height="3" fill="#FFF6E8"/>
+      <rect x="244" y="60" width="14" height="3" fill="#AEB4D8"/>
+      <rect x="244" y="66" width="18" height="3" fill="#AEB4D8"/>
+    </g>
+    <g id="mirG" class="hiddenF">
+      <rect x="8" y="42" width="18" height="26" fill="#6B4A2A"/>
+      <rect x="11" y="45" width="12" height="20" fill="#9FD1FF"/>
+      <rect x="13" y="47" width="3" height="8" fill="#FFF6E8"/>
+    </g>
+    <g id="photoG" class="hiddenF">
+      <rect x="296" y="38" width="26" height="20" fill="#6B4A2A"/>
+      <rect x="298" y="40" width="22" height="16" fill="#FFF6E8"/>
+      <rect x="303" y="43" width="4" height="4" fill="#EFB98F"/>
+      <rect x="302" y="47" width="6" height="7" fill="#FFC000"/>
+      <rect x="313" y="43" width="4" height="4" fill="#EFB98F"/>
+      <rect x="312" y="47" width="6" height="7" fill="#7FA8E8"/>
+    </g>
+    <g id="deskG">
+      <rect x="246" y="118" width="126" height="10" fill="#6B4A2A"/>
+      <rect x="252" y="128" width="8" height="26" fill="#55391F"/>
+      <rect x="356" y="128" width="8" height="26" fill="#55391F"/>
+      <rect x="276" y="80" width="52" height="30" fill="#2A2F52"/>
+      <rect id="scr" x="280" y="84" width="44" height="22" fill="#39406B"/>
+      <rect x="297" y="110" width="10" height="6" fill="#2A2F52"/>
+      <rect x="290" y="116" width="24" height="2" fill="#1E2340"/>
+      <rect x="258" y="119" width="42" height="6" fill="#3A4170"/>
+      <rect x="258" y="119" width="42" height="2" fill="#4A5285"/>
+      <rect x="308" y="120" width="10" height="6" fill="#AEB4D8"/>
+      <rect x="312" y="116" width="2" height="4" fill="#3A4170"/>
+      <g id="lampG" class="hiddenF">
+        <rect x="250" y="92" width="20" height="8" fill="#B0653F"/>
+        <rect x="255" y="100" width="10" height="3" fill="#FFE9A8"/>
+        <rect x="258" y="103" width="4" height="9" fill="#55391F"/>
+        <rect x="252" y="112" width="16" height="6" fill="#55391F"/>
+      </g>
+      <g id="plantG" class="hiddenF">
+        <rect x="346" y="104" width="20" height="4" fill="#8E4E2F"/>
+        <rect x="348" y="106" width="16" height="12" fill="#B0653F"/>
+        <rect x="350" y="92" width="6" height="12" fill="#3F9E6E"/>
+        <rect x="358" y="88" width="6" height="16" fill="#3F9E6E"/>
+        <rect x="344" y="94" width="6" height="10" fill="#3F9E6E"/>
+        <rect x="354" y="84" width="6" height="8" fill="#58C08A"/>
+      </g>
+    </g>
+    <g id="bedG" class="hiddenF">
+      <rect x="356" y="96" width="8" height="58" fill="#5A4030"/>
+      <rect x="252" y="132" width="112" height="10" fill="#6B4A2A"/>
+      <rect x="256" y="142" width="6" height="14" fill="#55391F"/>
+      <rect x="352" y="142" width="6" height="14" fill="#55391F"/>
+      <rect x="254" y="120" width="108" height="14" fill="#E9E2D2"/>
+      <rect x="258" y="112" width="26" height="10" fill="#FFF6E8"/>
+      <rect x="292" y="114" width="72" height="20" fill="#B0653F"/>
+      <rect x="292" y="120" width="72" height="3" fill="#8E4E2F"/>
+    </g>
+    <g id="chairG" class="hiddenF">
+      <rect x="298" y="138" width="28" height="6" fill="#7A5230"/>
+      <rect x="300" y="144" width="4" height="18" fill="#55391F"/>
+      <rect x="320" y="144" width="4" height="18" fill="#55391F"/>
+    </g>
+    <g id="shadowG" class="hiddenF"><g id="shadowW" style="transform-box:fill-box;transform-origin:50% 100%">
+      <rect x="146" y="42" width="48" height="10" fill="#161B33"/>
+      <rect x="138" y="52" width="64" height="22" fill="#161B33"/>
+      <rect x="128" y="74" width="84" height="52" fill="#161B33"/>
+      <rect x="136" y="126" width="68" height="24" fill="#161B33"/>
+    </g></g>
+    <g id="heroG" transform="translate(0,16)">
+      <rect x="160" y="40" width="60" height="10" fill="#FFC000"/>
+      <rect x="150" y="50" width="80" height="10" fill="#FFC000"/>
+      <rect x="140" y="60" width="100" height="60" fill="#FFC000"/>
+      <rect x="230" y="60" width="10" height="60" fill="#D99C00"/>
+      <rect x="160" y="60" width="60" height="10" fill="#D99C00"/>
+      <rect x="160" y="70" width="60" height="40" fill="#EFB98F"/>
+      <rect x="170" y="82" width="8" height="8" fill="#20264A"/>
+      <rect x="202" y="82" width="8" height="8" fill="#20264A"/>
+      <rect x="182" y="100" width="14" height="4" fill="#D89A6E"/>
+      <rect x="150" y="120" width="80" height="42" fill="#FFC000"/>
+      <rect x="186" y="120" width="8" height="42" fill="#D99C00"/>
+      <rect x="140" y="124" width="10" height="34" fill="#D99C00"/>
+      <rect x="230" y="124" width="10" height="34" fill="#D99C00"/>
+      <rect x="160" y="162" width="20" height="10" fill="#2A3158"/>
+      <rect x="200" y="162" width="20" height="10" fill="#2A3158"/>
+    </g>
+    <rect id="dimR" x="0" y="0" width="380" height="200" fill="#0B0E22" opacity="0"/>
+    <g id="flameTap" class="hiddenF" style="cursor:pointer">
+    <g id="flameW">
+      <g class="fA"><rect x="178" y="42" width="24" height="10" fill="#E8590C"/><rect x="180" y="32" width="20" height="10" fill="#FF8A2A"/><rect x="186" y="24" width="8" height="8" fill="#FFEFD0"/><rect x="184" y="35" width="4" height="4" fill="#6B2A00"/><rect x="193" y="35" width="4" height="4" fill="#6B2A00"/></g>
+      <g class="fB"><rect x="176" y="44" width="26" height="8" fill="#E8590C"/><rect x="182" y="34" width="18" height="10" fill="#FF8A2A"/><rect x="184" y="26" width="8" height="8" fill="#FFEFD0"/><rect x="186" y="37" width="4" height="4" fill="#6B2A00"/><rect x="194" y="37" width="4" height="4" fill="#6B2A00"/></g>
+    </g>
+    </g>
+  </svg>
+  </div>
+  <div id="dialog" role="log" aria-live="polite">
+    <span id="spk"></span>
+    <p id="txt"></p>
+    <span id="cue" class="hidden">▾</span>
+  </div>
+  <div id="actions"></div>
+</section>
+
+<section id="mirror" class="screen"></section>
+
+<section id="map" class="screen">
+  <div id="mapTop"><h2 class="px">МАПА СЕЗОНУ</h2><button id="heartBtn2" aria-label="Підтримка поруч" style="width:38px;height:38px;background:var(--panel);border:3px solid var(--line);box-shadow:0 3px 0 var(--line);color:var(--cream);font-size:16px;">♥</button></div>
+  <p id="codeTag" class="px"></p>
+  <div id="doors"></div>
+  <div id="stub"><div id="stubName" class="px" style="font-size:11px;color:var(--gold);letter-spacing:1px"></div><p id="stubTxt" style="margin:0"></p><button class="abtn gold" id="stubBack">Назад до мапи</button></div>
+</section>
+
+</div>
+
+<div id="fail">
+  <div class="big px">НЕ ВИЙШЛО.</div>
+  <p id="failTxt"></p>
+  <button id="failFlame" aria-label="Торкнутись Сигнала">
+    <svg width="96" height="96" viewBox="0 0 40 40" aria-hidden="true">
+      <g class="fA"><rect x="8" y="24" width="24" height="10" fill="#E8590C"/><rect x="10" y="14" width="20" height="10" fill="#FF8A2A"/><rect x="16" y="6" width="8" height="8" fill="#FFEFD0"/><rect x="14" y="17" width="4" height="4" fill="#6B2A00"/><rect x="23" y="17" width="4" height="4" fill="#6B2A00"/></g>
+      <g class="fB"><rect x="7" y="26" width="26" height="8" fill="#E8590C"/><rect x="12" y="16" width="18" height="10" fill="#FF8A2A"/><rect x="14" y="8" width="8" height="8" fill="#FFEFD0"/><rect x="16" y="19" width="4" height="4" fill="#6B2A00"/><rect x="24" y="19" width="4" height="4" fill="#6B2A00"/></g>
+    </svg>
+  </button>
+  <div class="hint px">ТОРКНИСЬ СИГНАЛА</div>
+</div>
+
+<div id="smodal" role="dialog" aria-modal="true" aria-label="Підтримка поруч">
+  <div class="box">
+    <h3 class="px">ПІДТРИМКА ПОРУЧ</h3>
+    <p>Ця гра не є психологічною допомогою. Якщо зараз важко, поруч є живі люди.</p>
+    <p>Телефон довіри: <span class="tel">7333</span>, цілодобово і безкоштовно.<br>За безпосередньої загрози життю: <span class="tel">112</span>.</p>
+    <p>Поговорити з кимось живим це не слабкість, а сильний хід.</p>
+    <button class="abtn gold" id="closeModal">Повернутись у гру</button>
+  </div>
+</div>
+
+<script>
+var CFG={sigStart:25,sigEvent:72,factBonus:6,
+mon:{act:{sig:38,en:10,pr:10},reframe:{sig:50},bond:{sig:54},avoid:{sig:34,quiet:2}},
+riseAvoid:42,riseOther:16,blameRelief:12,
+work:{rush:{pr:32,en:36,sig:6},steady:{pr:20,en:20,sig:0},micro:{pr:9,en:7,sig:-8},skip:{pr:0,en:-8,sig:-18,quiet:2}},
+skipRise:30,formBonus:6,step:{pr:8,sig:10,en:4},
+evBase:12,evSleep:12,evRhythm:9,decay:5,
+sickAt:16,sickHeal:45,sickCalm:12,
+thrGreat:84,thrOk:55};
+
+var S={name:"Слава",signal:CFG.sigStart,rhythm:50,energy:78,prog:0,quiet:0,
+route:[],choice:null,anchor:null,act:null,day:1,snap:null,dreamed:false,sickPending:false,skipped:false,pullHinted:false,pigOn:false,ep:1};
+var C={pal:0,pat:0,curtain:false,chair:false,plant:false};
+var G={nameIdx:1,eps:[false,false,false,false,false,false,false]};
+var AB="АВГДЕЄЖИЇКЛМНПРСТУФХЦШЮЯ23456789";
+function packCode(){var m=0;for(var i=0;i<7;i++){if(G.eps[i])m|=(1<<i)}
+var v=(G.nameIdx<<14)|(C.pal<<12)|(C.pat<<10)|((C.curtain?1:0)<<9)|((C.chair?1:0)<<8)|((C.plant?1:0)<<7)|m;
+var c=[(v>>15)&31,(v>>10)&31,(v>>5)&31,v&31];var chk=(c[0]+c[1]+c[2]+c[3])%32;
+return "ДІМ-"+AB[c[0]]+AB[c[1]]+AB[c[2]]+AB[c[3]]+AB[chk]}
+function parseCode(t){t=(t||"").toUpperCase();
+var L2C={"A":"А","B":"В","C":"С","E":"Е","H":"Н","K":"К","M":"М","P":"Р","T":"Т","X":"Х","Y":"У"};
+t=t.split("").map(function(ch){return L2C[ch]||ch}).join("");
+var f="";for(var i=0;i<t.length;i++){if(AB.indexOf(t[i])>=0)f+=t[i]}
+if(f.length<5)return null;f=f.slice(-5);var c=[];for(i=0;i<5;i++){c.push(AB.indexOf(f[i]))}
+if((c[0]+c[1]+c[2]+c[3])%32!==c[4])return null;
+var v=(c[0]<<15)|(c[1]<<10)|(c[2]<<5)|c[3];
+return {nameIdx:(v>>14)&3,pal:(v>>12)&3,pat:(v>>10)&3,curtain:!!((v>>9)&1),chair:!!((v>>8)&1),plant:!!((v>>7)&1),eps:v&127}}
+var PALS=[{n:"Синя",wall:"#2A3055",floor:"#191E3A",pat:"#222948"},
+{n:"Зелена",wall:"#26433A",floor:"#14231C",pat:"#1E382F"},
+{n:"Бежева",wall:"#5C5040",floor:"#3A3125",pat:"#4E4335"}];
+var PATS=["Без візерунка","Зірочки на підлозі","Спіральки на стінах","Смужки на стінах"];
+
+function $(id){return document.getElementById(id)}
+function clamp(v){return Math.max(0,Math.min(100,v))}
+function buildBlocks(el){var h="";for(var i=0;i<10;i++)h+="<i></i>";el.innerHTML=h}
+buildBlocks($("mSig"));buildBlocks($("mRhy"));buildBlocks($("mEn"));buildBlocks($("mPr"));
+
+function setMeter(el,val){var ks=el.children,n=Math.round(clamp(val)/10);
+for(var i=0;i<10;i++){ks[i].className=i<n?"on":""}}
+function refresh(){
+setMeter($("mSig"),S.signal);setMeter($("mRhy"),S.rhythm);setMeter($("mEn"),S.energy);setMeter($("mPr"),S.prog);
+var fs=0.55+S.signal/100*1.05;$("flameW").style.transform="scale("+fs.toFixed(2)+")";
+if(S.ep===4){$("shadowW").style.transform="scale("+(0.45+S.prog/100*0.95).toFixed(2)+")"}
+if(S.ep===1&&S.prog>0)$("scr").setAttribute("fill","#BFE3FF");
+}
+function setSignal(v){S.signal=clamp(v);refresh()}
+function setDay(t){$("dayTag").textContent=t}
+function setCd(t){$("cd").textContent=t}
+function setTime(mode){
+var pane=$("pane"),orb=$("orb"),dim=$("dimR");
+if(mode==="m"){pane.setAttribute("fill","#BFD9F2");orb.setAttribute("fill","#FFE9A8");dim.setAttribute("opacity","0")}
+if(mode==="d"){pane.setAttribute("fill","#F3C892");orb.setAttribute("fill","#FFB65C");dim.setAttribute("opacity","0")}
+if(mode==="e"){pane.setAttribute("fill","#16204A");orb.setAttribute("fill","#FFEFD0");dim.setAttribute("opacity","0.3")}
+}
+function applyRoom(){
+var p=PALS[C.pal];
+$("wall").setAttribute("fill",p.wall);
+$("floorR").setAttribute("fill",p.floor);
+["stripesG","spiralsG"].forEach(function(id){
+Array.prototype.forEach.call($(id).querySelectorAll("rect"),function(r){r.setAttribute("fill",p.pat)});
+});
+Array.prototype.forEach.call($("starsG").querySelectorAll("rect"),function(r){r.setAttribute("fill","#E0B34C")});
+$("starsG").classList.toggle("hiddenF",C.pat!==1);
+$("spiralsG").classList.toggle("hiddenF",C.pat!==2);
+$("stripesG").classList.toggle("hiddenF",C.pat!==3);
+$("curtainG").classList.toggle("hiddenF",!C.curtain);
+$("chairG").classList.toggle("hiddenF",!C.chair);
+$("plantG").classList.toggle("hiddenF",!C.plant);
+$("lampG").classList.toggle("hiddenF",!G.eps[0]);
+$("pigG").classList.toggle("hiddenF",!(G.eps[1]||S.pigOn));
+$("photoG").classList.toggle("hiddenF",!G.eps[2]);
+$("mirG").classList.toggle("hiddenF",!(G.eps[3]||S.mirrorOn));
+$("pledG").classList.toggle("hiddenF",!G.eps[4]);
+$("postG").classList.toggle("hiddenF",!G.eps[5]);
+$("starWinG").classList.toggle("hiddenF",!G.eps[6]);
+}
+function setRoomMode(mode){
+$("deskG").classList.toggle("hiddenF",mode==="bed");
+$("bedG").classList.toggle("hiddenF",mode!=="bed");
+if(mode==="bed")$("plantG").classList.add("hiddenF");else $("plantG").classList.toggle("hiddenF",!C.plant);
+}
+
+var dq=[],dcb=null,typing=false,ti=null,full="";
+function say(lines,cb){dq=lines.slice();dcb=cb;$("actions").innerHTML="";nextLine()}
+function nextLine(){
+if(typing){clearInterval(ti);typing=false;$("txt").textContent=full;$("cue").classList.remove("hidden");return}
+if(!dq.length){$("cue").classList.add("hidden");if(dcb){var c=dcb;dcb=null;c()}return}
+var L=dq.shift();renderSpk(L.w);typeText(L.t)
+}
+function renderSpk(w){var s=$("spk");
+if(w==="s"){s.className="s";s.innerHTML='<span class="flameDot"></span><span class="px">СИГНАЛ</span>'}
+else if(w==="t"){s.className="";s.innerHTML='<span class="flameDot" style="background:#161B33"></span><span class="px" style="color:#8A91BE">ТІНЬ</span>'}
+else if(w==="h"){s.className="";s.innerHTML='<span class="px">'+esc(S.name.toUpperCase())+'</span>'}
+else{s.className="";s.innerHTML='<span class="px">···</span>'}
+}
+function esc(t){return t.replace(/[<>&]/g,function(c){return c==="<"?"&lt;":c===">"?"&gt;":"&amp;"})}
+function typeText(t){full=t;$("txt").textContent="";$("cue").classList.add("hidden");typing=true;var i=0;
+ti=setInterval(function(){i+=2;$("txt").textContent=full.slice(0,i);
+if(i>=full.length){clearInterval(ti);typing=false;$("cue").classList.remove("hidden")}},18)}
+$("dialog").addEventListener("click",nextLine);
+$("dialog").tabIndex=0;
+$("dialog").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();nextLine()}});
+
+function actionsHTML(h){$("actions").innerHTML=h}
+function btn(label,sub,cls,id){return '<button class="abtn '+(cls||"")+'" id="'+id+'">'+label+(sub?'<small>'+sub+'</small>':"")+'</button>'}
+function task(t){return '<div class="task"><span class="px">▶ </span>'+t+'</div>'}
+function revealFlame(){$("flameTap").classList.remove("hiddenF")}
+
+var flameLines=["Я тут.","Дихай. Я просто інформація.","Гучність не дорівнює правді.","Ти мене чуєш, і це вже відповідь."];
+var fli=0;
+$("flameTap").addEventListener("click",function(){
+if(typing||dq.length)return;
+renderSpk("s");$("txt").textContent=flameLines[fli%flameLines.length];fli++;
+});
+$("heartBtn").addEventListener("click",function(){$("smodal").style.display="flex"});
+$("closeModal").addEventListener("click",function(){$("smodal").style.display="none"});
+var NAMES=[["nOr","Орися"],["nSl","Слава"],["nTa","Тарас"]];
+NAMES.forEach(function(p,idx){
+$(p[0]).onclick=function(){S.name=p[1];G.nameIdx=idx;NAMES.forEach(function(q){$(q[0]).classList.toggle("sel",q[0]===p[0])})};
+});
+function syncNameUI(){S.name=NAMES[G.nameIdx][1];NAMES.forEach(function(q,i){$(q[0]).classList.toggle("sel",i===G.nameIdx)})}
+$("heartBtn2").addEventListener("click",function(){$("smodal").style.display="flex"});
+$("stubBack").onclick=function(){$("stub").style.display="none"};
+$("haveCode").onclick=function(){$("codeRow").classList.toggle("hidden");$("codeIn").focus()};
+$("codeGo").onclick=function(){var r=parseCode($("codeIn").value);
+if(!r){$("codeMsg").textContent="Код не читається. Перевір символи і спробуй ще.";return}
+G.nameIdx=Math.min(2,r.nameIdx);C.pal=r.pal;C.pat=Math.min(3,r.pat);C.curtain=r.curtain;C.chair=r.chair;C.plant=r.plant;
+for(var i=0;i<7;i++){G.eps[i]=!!(r.eps&(1<<i))}
+syncNameUI();applyRoom();
+$("codeMsg").textContent="Код прийнято. Вітаємо вдома.";
+if(G.eps[0]){$("startBtn").textContent="На мапу сезону"}};
+
+$("startBtn").addEventListener("click",function(){
+$("intro").classList.add("hidden");
+if(G.eps[0]){goMap()}else{startEp1()}
+});
+function resetEp(){clearInterval(ti);typing=false;dq=[];dcb=null;
+S.signal=CFG.sigStart;S.rhythm=50;S.energy=78;S.prog=0;S.quiet=0;S.route=[];S.choice=null;S.anchor=null;S.act=null;S.day=1;S.snap=null;S.dreamed=false;S.sickPending=false;S.skipped=false;S.pullHinted=false;S.formUsed=false;S.pigOn=false;S.mirrorOn=false;$("mProgBox").style.display="";
+$("shadowG").classList.add("hiddenF");
+$("scr").setAttribute("fill","#39406B");$("flameTap").classList.add("hiddenF");$("fail").style.display="none";setCd("")}
+function startEp1(){resetEp();S.ep=1;$("epLab").textContent="МАКЕТ";syncNameUI();
+$("map").style.display="none";$("mirror").style.display="none";
+$("hud").classList.remove("hidden");$("meta").classList.remove("hidden");$("game").classList.remove("hidden");
+setRoomMode("work");applyRoom();refresh();b0()}
+var DOORS=["Четвер близько","На щось більше","Повідомлення без відповіді","Дзеркало кривих слів","Тиждень на нулі","Двері, які лякають","Тиждень, зібраний власноруч"];
+function goMap(){
+$("game").classList.add("hidden");$("hud").classList.add("hidden");$("meta").classList.add("hidden");
+$("mirror").style.display="none";$("intro").classList.add("hidden");$("stub").style.display="none";
+$("codeTag").textContent="КОД: "+packCode();
+renderDoors();$("map").style.display="flex"}
+function renderDoors(){var open7=G.eps[0]&&G.eps[1]&&G.eps[2]&&G.eps[3]&&G.eps[4]&&G.eps[5];
+var h="";
+for(var i=0;i<7;i++){var lock=(i===6&&!open7);
+h+='<button class="door'+(lock?" lock":"")+'" data-i="'+i+'"><span class="doorpx"><i></i></span><span>'+(lock?"???":DOORS[i])+'</span><span class="st">'+(G.eps[i]?"★ пройдено":(lock?"зачинено":(i<6?"відчинити":"скоро")))+'</span></button>'}
+$("doors").innerHTML=h;
+Array.prototype.forEach.call($("doors").children,function(el){
+el.onclick=function(){var i=+el.getAttribute("data-i");var open7=G.eps[0]&&G.eps[1]&&G.eps[2]&&G.eps[3]&&G.eps[4]&&G.eps[5];
+if(i===0){startEp1();return}
+if(i===1){startEp2();return}
+if(i===2){startEp3();return}
+if(i===3){startEp4();return}
+if(i===4){startEp5();return}
+if(i===5){startEp6();return}
+if(i===6&&open7){startEp7();return}
+if(i===6&&!open7){stubShow("???","Зачинено. Двері відчиняться, коли на п'ятьох сусідніх з'являться зірки.");return}
+stubShow("ЕПІЗОД "+(i+1)+" · "+DOORS[i],"Двері ще фарбуються: епізод у збірці. Сигнал зазирає у шпарину і каже, що всередині вже пахне свіжими пікселями.")}
+});}
+function stubShow(n,t){$("stubName").textContent=n;$("stubTxt").textContent=t;$("stub").style.display="flex"}
+
+function b0(){
+setDay("ЗНАЙОМСТВО");setCd("");setTime("d");
+say([
+{w:"n",t:S.name+". Двадцять чотири. Пів року на фрілансі: дизайн для студії з Торонто."},
+{w:"n",t:"Графік нестандартний. Коли Київ вечеряє, Торонто тільки вмикає ноутбуки, тож робочі повідомлення не знають слова «неробочий час»."},
+{w:"n",t:"У четвер здача лендингу для кав'ярні Maple Crumb з Торонто. Файл ще жодного разу не відкритий."}
+],custom);
+}
+
+function custom(){
+setDay("ТВІЙ КУТОК");
+say([{w:"n",t:"Але спершу: це твоя кімната. Зроби її своєю."}],function(){
+actionsHTML(
+task("Налаштуй кімнату стрілками. Як сподобається, тисни «Готово».")+
+'<div class="crow"><button class="arw" id="palL" aria-label="Попередній колір">◀</button><div class="cval"><span class="lab px">КІМНАТА</span><span id="palN">'+PALS[C.pal].n+'</span></div><button class="arw" id="palR" aria-label="Наступний колір">▶</button></div>'+
+'<div class="crow"><button class="arw" id="patL" aria-label="Попередній візерунок">◀</button><div class="cval"><span class="lab px">ВІЗЕРУНОК</span><span id="patN">'+PATS[C.pat]+'</span></div><button class="arw" id="patR" aria-label="Наступний візерунок">▶</button></div>'+
+'<p class="grouplab px">ДЕТАЛІ</p>'+
+'<div class="itemrow"><button class="chip" id="itC">Штора</button><button class="chip" id="itS">Стілець</button><button class="chip" id="itP">Рослина</button></div>'+
+btn("Готово, це мій дім","","gold","roomDone")
+);
+function paint(){$("palN").textContent=PALS[C.pal].n;$("patN").textContent=PATS[C.pat];
+$("itC").classList.toggle("sel",C.curtain);$("itS").classList.toggle("sel",C.chair);$("itP").classList.toggle("sel",C.plant);
+applyRoom()}
+$("palL").onclick=function(){C.pal=(C.pal+2)%3;paint()};
+$("palR").onclick=function(){C.pal=(C.pal+1)%3;paint()};
+$("patL").onclick=function(){C.pat=(C.pat+3)%4;paint()};
+$("patR").onclick=function(){C.pat=(C.pat+1)%4;paint()};
+$("itC").onclick=function(){C.curtain=!C.curtain;paint()};
+$("itS").onclick=function(){C.chair=!C.chair;paint()};
+$("itP").onclick=function(){C.plant=!C.plant;paint()};
+$("roomDone").onclick=function(){
+say([{w:"n",t:"Тепер це схоже на дім. Можна жити і працювати."}],b1);
+};
+});
+}
+
+function b1(){
+setDay("ПОНЕДІЛОК · 16:00");setCd("ДО ЗДАЧІ: 3 ДНІ");setTime("d");
+say([
+{w:"n",t:"Понеділок, шістнадцята за Києвом. У Торонто щойно дев'ята ранку."},
+{w:"n",t:"Телефон блимає. Марта, менеджерка студії: «Як прогрес?»"}
+],function(){
+revealFlame();setSignal(CFG.sigEvent);
+say([
+{w:"s",t:"Це я, Сигнал. Привіт, "+S.name+"."},
+{w:"s",t:"Я живу над твоєю головою стільки, скільки ти себе пам'ятаєш. Спалахую, коли стається щось важливе для тебе."},
+{w:"s",t:"У когось я тихий. У тебе від народження гучний. Це не вада, це чутливе налаштування системи сповіщення."},
+{w:"s",t:"Я не ворог і не вирок. Я сповіщаю. А що робити далі, вирішуєш ти."}
+],b2);
+});
+}
+
+function b2(){
+say([{w:"s",t:"Спершу назвімо, що сталось. Де тут факт, а де оцінка?"}],function(){factUI()});
+}
+function factUI(){
+actionsHTML(
+task("Торкнись того, що є фактом.")+
+btn("«Я не впораюсь. Я безнадійно відстаю.»","",'',"cEval")+
+btn("«Здача в четвер. Файл не відкритий.»","",'',"cFact")
+);
+$("cEval").onclick=function(){
+say([{w:"s",t:"Це оцінка. Вона гучна, але це не факт. Спробуй ще раз."}],factUI);
+};
+$("cFact").onclick=function(){
+setSignal(S.signal-CFG.factBonus);
+say([{w:"s",t:"Так. Факт спокійніший за оцінку, правда? Тепер обери відповідь."}],b3);
+};
+}
+
+function pullSize(){return Math.min(1.24,1+0.45*(S.signal/100)*(1-S.rhythm/100))}
+function applyPull(id){
+var p=pullSize();
+$(id).style.fontSize=(15*p).toFixed(1)+"px";
+if(p>=1.1&&!S.pullHinted){S.pullHinted=true;
+var el=document.createElement("p");el.className="hintline";
+el.textContent="Сигнал: бачиш, напис на кнопці паузи трохи більший за решту? Так гучність усередині тягне руку. Це нормально.";
+$("actions").appendChild(el)}
+}
+
+function b3(){
+actionsHTML(
+task("Обери свою відповідь.")+
+btn("Найменший крок","Відкрити файл і прочитати завдання. 10 хвилин.","","oAct")+
+btn("Перевести подих","Сказати собі: до четверга є три дні, почну з малого.","","oRef")+
+btn("Написати Максу","Розповісти другові, як тисне.","","oBond")+
+btn("Втекти в стрічку","Закрити чат і гортати відео.","","oAvoid")
+);
+applyPull("oAvoid");
+$("oAct").onclick=function(){pickMon("act")};
+$("oRef").onclick=function(){pickMon("reframe")};
+$("oBond").onclick=function(){pickMon("bond")};
+$("oAvoid").onclick=function(){pickMon("avoid")};
+}
+
+function pickMon(r){
+S.choice=r;S.route.push(r);
+if(r==="act"){
+S.energy=clamp(S.energy-CFG.mon.act.en);S.prog=clamp(S.prog+CFG.mon.act.pr);setSignal(CFG.mon.act.sig);refresh();
+say([{w:"n",t:"Файл відкритий. Завдання менше, ніж здавалося зі страху. Перші блоки макета стають на місця."},
+{w:"s",t:"Чуєш? Я тихішаю не тому, що мене заглушили. Це і є відповідь."}],function(){evening(nextMorning)});
+}
+if(r==="reframe"){
+setSignal(CFG.mon.reframe.sig);
+say([{w:"n",t:"Подих вирівнюється. Три дні. З малого."},
+{w:"s",t:"Добре сказано. Я поменшав. А маленький крок ще попереду."}],function(){evening(nextMorning)});
+}
+if(r==="bond"){
+setSignal(CFG.mon.bond.sig);
+say([{w:"n",t:"Макс: «о, знаю це відчуття. Давай ти сьогодні тільки відкриєш файл, а завтра розкажеш?»"},
+{w:"s",t:"Тепло, коли поруч хтось є. І дивись, у Макса теж план маленького кроку."}],function(){evening(nextMorning)});
+}
+if(r==="avoid"){
+S.quiet+=CFG.mon.avoid.quiet;S.skipped=true;setSignal(CFG.mon.avoid.sig);
+say([{w:"n",t:"Стрічка тепла і нескінченна. Пів години зникають непомітно."},
+{w:"s",t:"Мені одразу легше, чесно. Тільки… файл нікуди не подівся. Я повернусь."}],function(){evening(nextMorning)});
+}
+}
+
+var DAYS=["","ПОНЕДІЛОК","ВІВТОРОК","СЕРЕДА","ЧЕТВЕР"];
+var D5=["","ПОНЕДІЛОК","ВІВТОРОК","СЕРЕДА","ЧЕТВЕР","П'ЯТНИЦЯ"];
+function evening(next){
+setDay((S.ep===1?DAYS[S.day]:(S.ep===5?D5[S.day]:"ДЕНЬ "+S.day))+" · ВЕЧІР");setTime("e");
+say([{w:"s",t:"Вечір. Дрібниці, що тримають ритм."}],function(){
+var sel={};
+actionsHTML(
+task("Обери, чим завершити день.")+
+'<button class="chip" id="e1">Розкласти речі на завтра, 2 хвилини</button>'+
+'<button class="chip" id="e2">Поставити будильник одразу, без відкладань</button>'+
+'<button class="chip" id="e3">Лягти до опівночі</button>'+
+btn("Завершити день","","gold","eDone")
+);
+["e1","e2","e3"].forEach(function(id){
+$(id).onclick=function(){
+if(sel[id]){delete sel[id];$(id).classList.remove("sel")}
+else{sel[id]=true;$(id).classList.add("sel")}
+};
+});
+$("eDone").onclick=function(){
+var n=Object.keys(sel).length;
+if(S.ep===7&&n>0)S.rn=(S.rn||0)+1;
+S.rhythm=clamp(S.rhythm-CFG.decay+CFG.evRhythm*n);
+if(n===3){S.energy=clamp(S.energy+(S.ep===5?0:2))}else{S.energy=clamp(S.energy+CFG.evBase+(sel.e3?CFG.evSleep:0))}
+refresh();
+var seq=[{w:"n",t:"Ніч. Місто стишується."}];
+if(n===3){seq.push({w:"n",t:"Все зроблено. Ідеально. Тільки за ідеальність заплачено сном: «лягти вчасно» було в списку, а вийшло далеко за північ."});
+seq.push({w:"s",t:"Ритм не любить героїзму. Йому досить двох дрібниць."})}
+else if(n===0){seq.push({w:"s",t:"Теж окей. Не щодня є сили, і це не провал."})}
+else{seq.push({w:"s",t:"Ритм тримається. Дрібниці і є опора."})}
+say(seq,next);
+};
+});
+}
+
+function nextMorning(){
+S.day++;
+if(S.day===2)return tueMorning();
+if(S.day===3)return wedMorning();
+if(S.day===4)return thuMorning();
+}
+
+function tueMorning(){
+if(!S.snap){S.snap=JSON.stringify({signal:S.signal,rhythm:S.rhythm,energy:S.energy,prog:S.prog,quiet:S.quiet,choice:S.choice,route:S.route.slice(),skipped:S.skipped})}
+setDay("ВІВТОРОК · РАНОК");setCd("ДО ЗДАЧІ: 2 ДНІ");setTime("m");setRoomMode("work");
+if(S.sickPending)return sickDay();
+var avoided=S.choice==="avoid";
+setSignal(clamp(S.signal+(avoided?CFG.riseAvoid:CFG.riseOther)));
+if(avoided){
+say([{w:"n",t:"Вівторок. Файл досі закритий, здача ближче. У Торонто розгорається ранок, Марта вже онлайн."},
+{w:"s",t:"Я ж казав, що повернусь. Тепер голосніший, вибач. Це не покарання, це нагадування."},
+{w:"h",t:"«Знову все коту під хвіст. Безнадія, та й годі.»"},
+{w:"s",t:"Стоп. «Все» і «завжди» це мова оцінки. Розкладемо чинники чесно, свою частку оціниш останньою."}
+],blame);
+}else if(S.choice==="act"){
+say([{w:"n",t:"Вівторок. На екрані вже стоїть каркас лендингу: учорашні десять хвилин зробили більше, ніж здавалося."},
+{w:"s",t:"Бачиш смужку «Макет» угорі? Це не магія, це вчорашній маленький крок. Я тут, рівний і робочий."}],builder);
+}else if(S.choice==="reframe"){
+say([{w:"n",t:"Вівторок. Спокійніше, але файл ще чекає."},
+{w:"s",t:"Пам'ятаєш про малий крок? Сьогодні його день."}],builder);
+}else{
+say([{w:"n",t:"Вівторок. Макс зранку: «ну що, відкрив?»"},
+{w:"s",t:"Домовленість із другом теж тримає. Сьогодні день малого кроку."}],builder);
+}
+}
+
+function blame(){
+S.route.push("blame");
+var order=[];
+actionsHTML(
+task("Діаграма відповідальності: торкайся чинників по одному, свою частку оціниш останньою.")+
+'<button class="chip" id="f1">Завдання прийшло пізно, у п\'ятницю ввечері</button>'+
+'<button class="chip" id="f2">Вихідні з\'їли побутовка і втома</button>'+
+'<button class="chip" id="f3">Ніхто не поставив проміжний чек</button>'+
+'<button class="chip" id="f4" disabled>Моя частка. Спершу решта чинників</button>'+
+'<div class="slices" id="sl"><i></i><i></i><i></i><i class="me"></i></div>'
+);
+function upd(){
+var sl=$("sl").children;
+for(var i=0;i<4;i++)sl[i].className=(i<order.length?"on ":"")+(i===3?"me":"");
+if(order.length===3){var f4=$("f4");f4.disabled=false;f4.textContent="Моє відкладання. Ось моя частка"}
+}
+["f1","f2","f3"].forEach(function(id){
+$(id).onclick=function(){if(order.indexOf(id)>=0)return;order.push(id);$(id).classList.add("sel");upd()};
+});
+$("f4").onclick=function(){
+if(order.length<3)return;order.push("f4");$("f4").classList.add("sel");upd();
+setSignal(S.signal-CFG.blameRelief);
+say([{w:"s",t:"Твоя частка є. Вона одна з чотирьох, а не сто відсотків. Це чесніше, і з часткою можна працювати."}],builder);
+};
+}
+
+function builder(){
+say([{w:"s",t:"Закріпимо найменший крок так, щоб він стався сам. Формула проста: настає момент, стається дія."}],function(){
+var a=null,b=null;
+var anchors={a1:"зроблю ранкову каву",a2:"сяду в транспорт",a3:"вийду з душу"};
+var acts={d1:"відкрию файл і прочитаю завдання",d2:"напишу три речення начорно",d3:"випишу перші кроки на стікер"};
+actionsHTML(
+task("Склади формулу: спершу обери момент, потім дію.")+
+'<p class="grouplab px">МОМЕНТ</p>'+
+'<button class="chip" id="a1">Коли зроблю ранкову каву</button>'+
+'<button class="chip" id="a2">Коли сяду в транспорт</button>'+
+'<button class="chip" id="a3">Коли вийду з душу</button>'+
+'<p class="grouplab px">ДІЯ</p>'+
+'<button class="chip" id="d1">Відкрию файл і прочитаю завдання</button>'+
+'<button class="chip" id="d2">Напишу три речення начорно</button>'+
+'<button class="chip" id="d3">Випишу перші кроки на стікер</button>'+
+'<div id="preview">Якщо <b>…</b>, то <b>…</b>.</div>'+
+btn("Закріпити","","gold","fixBtn")
+);
+function paint(){
+["a1","a2","a3"].forEach(function(i){$(i).classList.toggle("sel",a===i)});
+["d1","d2","d3"].forEach(function(i){$(i).classList.toggle("sel",b===i)});
+$("preview").innerHTML="Якщо <b>"+(a?anchors[a]:"…")+"</b>, то <b>"+(b?acts[b]:"…")+"</b>.";
+}
+["a1","a2","a3"].forEach(function(i){$(i).onclick=function(){a=i;paint()}});
+["d1","d2","d3"].forEach(function(i){$(i).onclick=function(){b=i;paint()}});
+$("fixBtn").onclick=function(){
+if(!a||!b){$("preview").innerHTML="Обери момент і дію, тоді формула складеться.";return}
+S.anchor=a;S.act=b;
+say([{w:"s",t:"Записано. Тепер це не сила волі на весь проєкт, а один гачок на один момент."}],workSlot);
+};
+});
+}
+
+function workSlot(){
+setDay(DAYS[S.day]+" · ДЕНЬ");setTime("d");
+var last=S.day===4;
+say([{w:"n",t:last?"Останні години перед здачею. Скільки вкласти зараз?":"Попереду робочий блок. Скільки сил вкласти в макет сьогодні?"}],function(){
+actionsHTML(
+task("Обери навантаження на сьогодні.")+
+btn("Великий ривок","Три години з головою.","","wRush")+
+btn("Рівний блок","Півтори години, блок за блоком.","","wSteady")+
+btn("Мікрокрок","Двадцять хвилин.","","wMicro")+
+btn("Не сьогодні","Закрити файл. Стрічка, чай.","","wSkip")
+);
+applyPull("wSkip");
+$("wRush").onclick=function(){doWork("rush")};
+$("wSteady").onclick=function(){doWork("steady")};
+$("wMicro").onclick=function(){doWork("micro")};
+$("wSkip").onclick=function(){doWork("skip")};
+});
+}
+
+var MILES=[[12,"Бриф перечитано двічі: кав'ярня Maple Crumb хоче тепла, крафту і трохи ретро."],[25,"Мудборд зібрано: пшеничні тони, крафтовий папір, пара над горнятком."],[45,"Каркас сторінки стоїть: дванадцять колонок, герой-блок, меню, історія, контакти."],[60,"Хіро-блок ожив: заголовок, кнопка, перший екран уже пахне кавою."],[78,"Секції зібрані, кнопки мають стани, сітка тримає все купи."],[90,"Типографіка і кольори розкладені по стилях, мобільна версія збігається з десктопом."],[100,"Шари перейменовано, прототип клікається, файл готовий летіти."]];
+function progLine(){for(var i=0;i<MILES.length;i++){if(S.prog<=MILES[i][0])return MILES[i][1]}return MILES[MILES.length-1][1]}
+function doWork(k){
+var w=CFG.work[k];
+S.route.push(k);
+S.prog=clamp(S.prog+w.pr);
+S.energy=clamp(S.energy-w.en);
+setSignal(S.signal+w.sig);
+if(k!=="skip"&&S.anchor&&!S.formUsed){S.formUsed=true;S.prog=clamp(S.prog+CFG.formBonus)}
+if(k==="skip"){S.quiet+=CFG.work.skip.quiet;S.skipped=true}
+refresh();
+var lines={
+rush:[{w:"n",t:"Три години в потоці. "+progLine()+" У тілі дзвенить утома."},{w:"s",t:"Сильно. Тільки глянь на смужку енергії: ривки беруть у борг."}],
+steady:[{w:"n",t:"Півтори години рівної роботи. "+progLine()},{w:"s",t:"Отак і будуються макети. І тижні."}],
+micro:[{w:"n",t:"Двадцять хвилин. "+progLine()},{w:"s",t:"Маленький крок теж крок. Я тихішаю."}],
+skip:[{w:"n",t:"Не сьогодні. Стрічка, чай, серіал на фоні."},{w:"s",t:"Легше одразу, я знаю. І я повернусь гучнішим, ти теж знаєш."}]
+};
+say(lines[k],function(){
+if(S.energy<CFG.sickAt&&S.day<4){S.sickPending=true;
+say([{w:"n",t:"Надвечір тіло раптом стає ватяним. Голова гуде, очі злипаються."},
+{w:"s",t:"Це вже не я. Це тіло виставляє рахунок за борги."}],function(){evening(nextMorning)});
+}else if(S.day===4){deadline()}
+else{evening(nextMorning)}
+});
+}
+
+function sickDay(){
+S.sickPending=false;S.route.push("sick");
+setRoomMode("bed");setDay(DAYS[S.day]+" · ЛІКАРНЯНИЙ");
+S.energy=clamp(S.energy+CFG.sickHeal);
+setSignal(S.signal-CFG.sickCalm);
+say([
+{w:"n",t:"Ранок не вмикається. Тіло каже: сьогодні ліжко, чай і нічого героїчного."},
+{w:"s",t:"Відпочинок, який ти обираєш, це стратегія. Відпочинок, який тебе змушує, це рахунок. Сьогодні платимо."},
+{w:"n",t:"День минає повільно. Надвечір дихається легше."}
+],function(){
+setRoomMode("work");
+S.day++;S.rhythm=clamp(S.rhythm-CFG.decay);
+if(S.day===4){thuMorning()}else{wedMorning()}
+});
+}
+
+function wedMorning(){
+setDay("СЕРЕДА · РАНОК");setCd("ДО ЗДАЧІ: 1 ДЕНЬ");setTime("m");setRoomMode("work");
+if(S.sickPending)return sickDay();
+if(S.skipped&&S.route[S.route.length-1]==="skip")setSignal(S.signal+CFG.skipRise);
+var sceneLine={a1:"Кава парує.",a2:"Транспорт м'яко гойдає.",a3:"Волосся ще вологе після душу."}[S.anchor]||"Ранок починається.";
+say([{w:"n",t:"Середа. "+sceneLine+" Момент із формули настав."},{w:"n",t:"Дзинь: Марта. «Дрібниця: у партнера оновилось лого, підмінеш файлик? Не горить.»"},{w:"s",t:"Дрібні правки це погода процесу, а не вирок роботі."}],function(){
+actionsHTML(task("Формула спрацювала. Твій хід.")+btn("Зробити крок","","gold","stepBtn"));
+$("stepBtn").onclick=function(){
+S.route.push("step");
+S.prog=clamp(S.prog+CFG.step.pr);S.energy=clamp(S.energy-CFG.step.en);setSignal(S.signal-CFG.step.sig);refresh();
+say([{w:"n",t:"Десять хвилин за формулою. Файл відкритий ще до того, як мозок встиг сперечатись."},
+{w:"s",t:"Бачиш, я не зник. Я став розміром із завдання, а не з катастрофу."}],workSlot);
+};
+});
+}
+
+function thuMorning(){
+setDay("ЧЕТВЕР · РАНОК");setCd("ЗДАЧА СЬОГОДНІ");setTime("m");setRoomMode("work");
+if(S.sickPending){
+say([{w:"n",t:"Четвер. Тіло не встає. Здача сьогодні, а сил нема навіть на каву."},
+{w:"s",t:"Борг зібрався весь і одразу. Мені шкода."}],function(){resolveEnd(true)});
+return;
+}
+if(S.skipped&&S.route[S.route.length-1]==="skip")setSignal(S.signal+CFG.skipRise);
+var st=S.prog>=CFG.thrGreat?"Макет майже дихає. Лишились дрібниці.":S.prog>=CFG.thrOk?"Макет тримається купи. Ще один добрий блок, і можна здавати.":"Файл усе ще більше план, ніж макет. Часу лишилось мало.";
+say([{w:"n",t:"Четвер. О шістнадцятій за Києвом у Торонто відкриють пошту."},{w:"s",t:st}],workSlot);
+}
+
+function deadline(){
+setDay("ЧЕТВЕР · 16:00");setCd("");setTime("d");
+if(S.prog>=CFG.thrGreat){
+say([{w:"n",t:"Файл летить у Торонто. Відповідь приходить за одинадцять хвилин."},
+{w:"n",t:"Марта: «Wow. Це краще, ніж ми просили.»"},
+{w:"s",t:"Чуєш, як я звучу? Рівно і спокійно. Ти мене не глушиш. Ти ведеш. Так ми і пройшли цей тиждень."}],function(){mirror("A1")});
+}else if(S.prog>=CFG.thrOk){
+say([{w:"n",t:"Файл іде вчасно. Робоча версія, чесна."},
+{w:"n",t:"Марта: «Дякую! Допрацюємо разом у п'ятницю.»"},
+{w:"s",t:"Здано. Не ідеально, а вчасно і достатньо. Іноді це і є перемога."}],function(){mirror("A2")});
+}else{resolveEnd(false)}
+}
+
+function showFail(txt,wakeFn){$("failTxt").textContent=txt;$("fail").style.display="flex";
+$("failFlame").onclick=function(){$("fail").style.display="none";wakeFn()}}
+function resolveEnd(sickFail){
+if(!S.dreamed){
+showFail("Четвер, шістнадцята. Файл не полетів. Повідомлення від студії читати страшно.",wake);
+}else{
+say([{w:"n",t:"Розмова з Мартою. Довга і чесна."},
+{w:"n",t:"Дедлайн перенесли на понеділок. Неприємно. І це можна пережити."},
+{w:"s",t:"Провал це подія, а не вирок про тебе. У понеділка теж є ранок."}],function(){mirror("C")});
+}
+}
+
+function wake(){
+var sn=JSON.parse(S.snap);
+S.signal=sn.signal;S.rhythm=sn.rhythm;S.energy=sn.energy;S.prog=sn.prog;S.quiet=sn.quiet;
+S.choice=sn.choice;S.route=sn.route.slice();S.skipped=sn.skipped;
+S.day=2;S.dreamed=true;S.sickPending=false;S.formUsed=false;S.anchor=null;S.act=null;
+S.route.push("dream");
+refresh();
+setRoomMode("bed");setTime("m");setDay("ВІВТОРОК · РАНОК");setCd("ДО ЗДАЧІ: 2 ДНІ");
+say([
+{w:"n",t:"Різкий вдих. Стеля. Тиша. Простирадло збите в жмут."},
+{w:"s",t:"Це був сон. Мій сон, вибач: коли я дуже гучний, я вночі показую найгірші кінцівки."},
+{w:"s",t:"Але поглянь: надворі лише вівторок. Усе справжнє ще попереду, і тепер ти знаєш, куди дивитись."},
+{w:"n",t:"Кава. Стіл. Той самий макет, і два справжні дні."}
+],function(){
+setRoomMode("work");
+S.snap=JSON.stringify({signal:S.signal,rhythm:S.rhythm,energy:S.energy,prog:S.prog,quiet:S.quiet,choice:S.choice,route:S.route.slice(),skipped:S.skipped});
+tueAfterWake();
+});
+}
+
+function tueAfterWake(){
+var avoided=S.choice==="avoid";
+setSignal(clamp(S.signal+(avoided?CFG.riseAvoid:CFG.riseOther)));
+if(avoided){
+say([{w:"s",t:"Учорашня пауза досі чекає в файлі. Спершу розберемо одну гучну думку, потім до діла."},
+{w:"h",t:"«Знову все коту під хвіст. Безнадія, та й годі.»"},
+{w:"s",t:"Стоп. «Все» і «завжди» це мова оцінки. Розкладемо чинники чесно, свою частку оціниш останньою."}],blame);
+}else{
+say([{w:"s",t:"План простий: формула, робочий блок, вечір для ритму. Смужки вгорі підкажуть."}],builder);
+}
+}
+
+function mirror(tier){
+setDay("ЕПІЗОД 1 · ЗАВЕРШЕНО");setCd("");G.eps[0]=true;
+var names={act:"маленький крок",reframe:"передих і переоцінка",bond:"розмова з другом",avoid:"пауза у стрічці",blame:"розбір гучної думки",step:"крок за формулою",rush:"великий ривок",steady:"рівний блок",micro:"мікрокрок",skip:"пауза «не сьогодні»",sick:"лікарняний",dream:"сон-попередження"};
+var path=S.route.map(function(r){return names[r]||r}).join(" → ");
+var ends={A1:{t:"БЛИСКУЧЕ ЗДАНО",d:"Макет у Торонто, студія у захваті, Сигнал звучить рівно. Тиждень пройдено разом."},
+A2:{t:"ЗДАНО ВЧАСНО",d:"Робоча версія пішла вчасно. Не ідеал, а чесний результат живої людини."},
+C:{t:"ЧЕСНА РОЗМОВА",d:"Дедлайн переїхав на понеділок. Провал це подія, а не вирок: у понеділка теж є ранок."}};
+var quietTxt=S.quiet>0
+?"Тиха ціна: "+S.quiet+". Це справи, що почекали і повернулись трохи більшими. Без осуду: тепер ти їх бачиш."
+:"Тиха ціна: 0. Нічого не чекало в тіні. Так теж буває, і це не обов'язок на щодня.";
+$("game").classList.add("hidden");
+var m=$("mirror");
+m.style.display="flex";
+m.innerHTML=
+'<h2 class="px">ДЗЕРКАЛО ЕПІЗОДУ</h2>'+
+'<div class="mcard end"><div class="cap px">КІНЦІВКА</div><div class="big px">'+ends[tier].t+'</div><div style="margin-top:8px">'+ends[tier].d+'</div></div>'+
+'<div class="mcard"><div class="cap px">ТВІЙ МАРШРУТ</div>'+esc(path)+'.<br>Сигнал звучав, і на нього була відповідь. Без правильних і неправильних ходів, лише різні ціни.</div>'+
+'<div class="statrow">'+
+'<div class="st"><div class="v">'+Math.round(S.prog)+'</div><div class="k px">МАКЕТ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.signal)+'</div><div class="k px">СИГНАЛ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.rhythm)+'</div><div class="k px">РИТМ</div></div>'+
+'<div class="st"><div class="v">'+S.quiet+'</div><div class="k px">ТИХА ЦІНА</div></div>'+
+'</div>'+
+'<div class="mcard">'+quietTxt+'</div>'+
+'<button class="abtn" id="sciBtn">Як це працює. Для допитливих</button>'+
+'<div class="mcard hidden" id="sciCard"><div class="cap px">НАУКОВА КАРТКА · 1 з 7</div>'+
+'Коротко і по-людськи. Коли всередині гучно, найлегше вдати, що справи не існує: стає легше одразу, а справа тим часом росте в темряві. Це не лінь і не слабкість, це найзвичніша пастка чутливих людей. У дослідженні 314 українців 18-29 років саме вона пояснює приблизно третину шляху від «мені тривожно» до «я виснажений». І друга новина, хороша: буденні дрібниці режиму, сон, план на завтра, дрібний порядок, послаблюють саме бажання тікати. У людей з міцним щоденним ритмом тривога перетворюється на виснаження приблизно вдвічі слабше. Тому відпочинок і вечірні дрібниці тут не декор, а робоча механіка. Як і в житті.</div>'+
+'<div class="mcard"><div class="cap px">СИГНАЛ</div>Я нікуди не дінусь, і це добре: я твоя система сповіщення. До зустрічі в епізоді 2.</div>'+
+'<div class="mcard safe">Якщо напруга чи пригніченість не слабшають понад два тижні, ламаються сон або щоденні справи, чи з\'являються думки про самоушкодження: це привід звернутись до фахівця. Телефон довіри 7333, цілодобово. Екстрена допомога 112.</div>'+
+'<div class="codecard"><div class="cap px" style="color:var(--mist)">КОД ЗБЕРЕЖЕННЯ</div><div class="cd px" id="saveCode"></div><div style="font-size:12px;color:#CDB578;margin-top:6px">Запиши або сфотографуй: він поверне кімнату і зірки наступного разу.</div></div>'+
+'<button class="abtn gold" id="mapBtn">На мапу сезону</button>'+
+'<button class="abtn" id="againBtn">Пройти епізод ще раз, іншим маршрутом</button>';
+$("sciBtn").onclick=function(){$("sciCard").classList.toggle("hidden")};
+$("saveCode").textContent=packCode();
+$("mapBtn").onclick=goMap;
+$("againBtn").onclick=startEp1;
+}
+
+var GO=[["Ноутбук для роботи","новий ноутбук","Старий гальмує на великих макетах."],["Поїздка до моря","поїздку до моря","Тиждень без ноутбука взагалі."],["Курс 3D","курс 3D","Давно кортить у новий інструмент."]];
+function startEp2(){resetEp();S.ep=2;$("epLab").textContent="ЦІЛЬ";syncNameUI();
+S.goalAcc="";S.esc=0;S.basket=0;S.joy=false;S.pjPick=null;S.f2=null;S.tight=false;S.said1=0;
+$("map").style.display="none";$("mirror").style.display="none";
+$("hud").classList.remove("hidden");$("meta").classList.remove("hidden");$("game").classList.remove("hidden");
+setRoomMode("work");applyRoom();refresh();e2b0()}
+function e2b0(){
+setDay("НОВИЙ МІСЯЦЬ");setCd("ДЕНЬ 1 З 4");setTime("d");
+say([
+{w:"n",t:"Новий місяць. У стрічці банер розпродажу, а в нотатках ціль, на яку відкладається вже другий місяць."},
+{w:"n",t:"Виплата від студії буде п'ятнадцятого. Маленькі «можна собі дозволити» будуть щодня."}
+],function(){
+revealFlame();setSignal(58);
+say([{w:"s",t:"Це знову я. Цього місяця я спалахуватиму не лише на дедлайни. На вітрини теж, побачиш."}],e2goal);
+});
+}
+function e2goal(){
+actionsHTML(task("Обери, на що збираєш.")+
+btn(GO[0][0],GO[0][2],"","g0")+btn(GO[1][0],GO[1][2],"","g1")+btn(GO[2][0],GO[2][2],"","g2"));
+[0,1,2].forEach(function(i){$("g"+i).onclick=function(){S.goalAcc=GO[i][1];e2sum()}});
+}
+function e2sum(){
+actionsHTML(task("Скільки відкласти цього місяця?")+
+btn("Обережно","Потроху, зате точно.","","s0")+
+btn("Впевнено","Відчутно, але без героїзму.","","s1")+
+btn("Амбітно","По-максимуму.","","s2"));
+["s0","s1","s2"].forEach(function(id){$(id).onclick=function(){
+S.pigOn=true;applyRoom();
+say([{w:"n",t:"Скарбничка стає на порожню поличку між вікном і тобою. Рішуча."},
+{w:"s",t:"Тепер назвімо чесно, з чим воюємо. Де факт, а де оцінка?"}],e2fact);
+}});
+}
+function e2fact(){
+actionsHTML(task("Торкнись того, що є фактом.")+
+btn("«Я не вмію поводитися з грошима.»","","","q1")+
+btn("«Минулого місяця шість дрібних покупок з'їли відчутну суму.»","","","q2"));
+$("q1").onclick=function(){say([{w:"s",t:"Це оцінка. Гучна і несправедлива. Спробуй ще."}],e2fact)};
+$("q2").onclick=function(){setSignal(S.signal-6);
+say([{w:"s",t:"Так. Шість покупок це факт, з ним можна працювати. Поставимо правило паузи."}],e2formula)};
+}
+function e2formula(){
+var acts={f1:"кладу цю річ у кошик на добу",f2:"переводжу цю ж суму в ціль",f3:"питаю себе: радість чи знеболення"};
+var b=null;
+actionsHTML(task("Склади правило паузи: обери свою дію.")+
+'<p class="grouplab px">ЯКЩО КОРТИТЬ КУПИТИ, ТО...</p>'+
+'<button class="chip" id="f1">Кладу в кошик на добу</button>'+
+'<button class="chip" id="f2">Переводжу цю ж суму в ціль</button>'+
+'<button class="chip" id="f3">Питаю себе: радість чи знеболення?</button>'+
+'<div id="preview">Якщо кортить купити, то <b>…</b>.</div>'+
+btn("Закріпити","","gold","f2fix"));
+["f1","f2","f3"].forEach(function(i){$(i).onclick=function(){b=i;
+["f1","f2","f3"].forEach(function(q){$(q).classList.toggle("sel",q===i)});
+$("preview").innerHTML="Якщо кортить купити, то <b>"+acts[i]+"</b>."}});
+$("f2fix").onclick=function(){if(!b){$("preview").innerHTML="Обери дію, і формула складеться.";return}
+S.f2=b;
+say([{w:"s",t:"Записано. Правило не забороняє купувати. Воно повертає тобі секунду вибору."}],e2planned)};
+}
+function e2planned(){
+actionsHTML(task("Обери одну заплановану радість на цей місяць.")+
+'<button class="chip" id="p0">Кіно у четвер</button>'+
+'<button class="chip" id="p1">Вечеря з Максом</button>'+
+'<button class="chip" id="p2">Нова книжка</button>'+
+'<button class="chip" id="p3">Цього місяця без радості</button>');
+[0,1,2].forEach(function(i){$("p"+i).onclick=function(){S.pjPick=i;
+say([{w:"s",t:"Записано в календар. Радість, у якої є дата, не проситься щодня."}],function(){e2day(1)})}});
+$("p3").onclick=function(){S.pjPick=-1;
+say([{w:"s",t:"Суворо. Подивимось, як воно."}],function(){e2day(1)})};
+}
+function e2day(d){
+S.day=d;setTime("d");
+setDay("ДЕНЬ "+d+" З 4");
+setCd(d<3?"ВИПЛАТА: 15-ГО":"ЦІЛЬ: "+Math.round(S.prog)+"%");
+if(d===1){say([{w:"n",t:"Ніч була коротка, ранок сірий. Дорогою повз кав'ярню тягне запахом і теплом."}],function(){e2tempt(1,"плюс","Кава з сиропом. Тепла, солодка, поруч.")})}
+if(d===2){say([{w:"n",t:"Дзвінок нового клієнта: холодний тон, правки, стислі строки. Слухавка кладеться, у грудях гуде."}],function(){setSignal(S.signal+18);
+say([{w:"s",t:"Чуєш мене? День справді важкий. Дивись уважно, що покличе першим."}],function(){e2tempt(2,"знеболення","«Заслужена радість»: замовити доставку того самого, смачного.")})})}
+if(d===3){say([{w:"n",t:"Дзинь: виплата від студії. Менша за омріяну, зате справжня."}],e2payout)}
+if(d===4){e2rev()}
+}
+function e2tempt(d,kind,itemLine){
+if(S.esc>0)setSignal(S.signal+6*S.esc);
+var frees=["Пройтися до річки","Подзвонити Максу","Плейлист і чай на підвіконні"];
+say([{w:"n",t:itemLine}],function(){
+actionsHTML(task("Що робиш із бажанням?")+
+btn("Купити зараз","","","tBuy")+
+btn("У кошик на добу","","","tBask")+
+btn("Цю ж суму в ціль","","","tGoal")+
+btn("Радість без грошей",frees[d-1],"","tFree"));
+var p=Math.min(1.34,pullSize()*(1+0.08*S.esc));
+$("tBuy").style.fontSize=(15*p).toFixed(1)+"px";
+$("tBuy").onclick=function(){e2buy(d)};
+$("tBask").onclick=function(){e2bask(d)};
+$("tGoal").onclick=function(){e2goalput(d)};
+$("tFree").onclick=function(){e2free(d)};
+});
+}
+function e2buy(d){
+S.prog=Math.max(0,S.prog-(S.tight?12:8));S.quiet+=2;S.esc++;setSignal(S.signal-15);refresh();
+var tok=d===2?"znebol":(d===3?"sale":"buy");S.route.push(tok);
+var L={1:[{w:"n",t:"Стаканчик гріє долоню. Смачно."},{w:"s",t:"Я впав одразу, відчуваєш? Дрібниця. Дрібниці вміють додаватися."}],
+2:[{w:"n",t:"Доставка їде. Вечір м'якшає."},{w:"s",t:"Полегшало одразу, чесно. Питання лиш, хто обирав: ти до, чи моя гучність після."}],
+3:[{w:"n",t:"Куплено. Гарне."},{w:"s",t:"Мінус сорок на непотрібне лишається мінусом на непотрібне. Але гарне, визнаю."}]}[d];
+say(L,function(){e2next(d)});
+}
+function e2bask(d){
+S.basket++;setSignal(S.signal-8);
+if(S.f2==="f1"&&!S.formUsed){S.formUsed=true;S.prog=Math.min(100,S.prog+6)}
+refresh();S.route.push("basket");
+var seq=[{w:"n",t:"У кошик. Хай добу постоїть."}];
+if(!S.said1){S.said1=1;seq.push({w:"s",t:"Пауза це не відмова. Пауза це ти між спалахом і рукою."})}
+say(seq,function(){e2next(d)});
+}
+function e2goalput(d){
+S.prog=Math.min(100,S.prog+10);setSignal(S.signal-4);
+if(S.f2==="f2"&&!S.formUsed){S.formUsed=true;S.prog=Math.min(100,S.prog+6)}
+refresh();S.route.push("togoal");
+var seq=[{w:"n",t:"Дзвяк. Сума пірнає в скарбничку."}];
+if(S.said1<2){S.said1=2;seq.push({w:"s",t:"Вітрина щойно профінансувала твою ціль. Люблю такі розвороти."})}
+say(seq,function(){e2next(d)});
+}
+function e2free(d){
+setSignal(S.signal-10);S.energy=clamp(S.energy-2);S.joy=true;
+if(S.f2==="f3"&&!S.formUsed){S.formUsed=true;S.prog=Math.min(100,S.prog+6)}
+refresh();S.route.push("free");
+var L={1:"Пів години вздовж води. Бажання лишилось на березі.",2:"Макс бере слухавку з другого гудка. Пів години сміху.",3:"Чай, плейлист, підвіконня. Вечір складається сам."}[d];
+say([{w:"n",t:L},{w:"s",t:"Дивись: напруга впала, а ціль ціла. Безкоштовне теж працює."}],function(){e2next(d)});
+}
+function e2next(d){
+if(d===2&&S.route[S.route.length-1]==="znebol"){e2wave();return}
+if(d===3){evening(function(){e2day(4)});return}
+evening(function(){e2day(d+1)});
+}
+function e2wave(){
+say([{w:"n",t:"Пізній вечір. Застосунок доставки знову відкритий сам собою, палець висить над «додати ще»."}],function(){
+actionsHTML(task("Друга хвиля.")+
+btn("Додати ще щось смачне","","","w1")+
+btn("Закрити застосунок","","","w2"));
+$("w1").onclick=function(){S.prog=Math.max(0,S.prog-5);S.esc++;S.quiet++;refresh();S.route.push("wave");
+say([{w:"n",t:"Додано. Вечір ще м'якший."},{w:"s",t:"Бачиш ескалацію? Кожне знеболення кличе наступне, трохи голосніше."}],function(){evening(function(){e2day(3)})})};
+$("w2").onclick=function(){setSignal(S.signal-6);S.route.push("close");
+say([{w:"n",t:"Закрито. Пальцям хвилину незвично, потім відпускає."},{w:"s",t:"Оця хвилина незручності і є м'яз."}],function(){evening(function(){e2day(3)})})};
+});
+}
+function e2payout(){
+actionsHTML(task("Розподіли виплату.")+
+btn("Половину одразу в ціль","","","y1")+
+btn("Чверть у ціль","","","y2")+
+btn("Спершу на життя, ціль потім","","","y3"));
+$("y1").onclick=function(){S.prog=Math.min(100,S.prog+30);S.tight=true;refresh();S.route.push("pay50");
+say([{w:"n",t:"Скарбничка важчає одразу і відчутно."},{w:"s",t:"Сміливо. Місяць буде тіснішим, тримай мене в полі зору біля вітрин."}],e2afterPay)};
+$("y2").onclick=function(){S.prog=Math.min(100,S.prog+18);refresh();S.route.push("pay25");
+say([{w:"n",t:"Рівний внесок. І на життя лишилось."}],e2afterPay)};
+$("y3").onclick=function(){S.prog=Math.min(100,S.prog+6);setSignal(S.signal-6);refresh();S.route.push("pay0");
+say([{w:"n",t:"Життя видихнуло."},{w:"s",t:"Окей. Тоді цілі допоможуть дрібні розвороти, коли трапляться."}],e2afterPay)};
+}
+function e2afterPay(){
+setCd("ЦІЛЬ: "+Math.round(S.prog)+"%");
+say([{w:"n",t:"Надвечір стрічка підкидає: мінус сорок відсотків лише сьогодні на гарний органайзер, який нікуди не планувався."}],function(){e2tempt(3,"sale","Знижка лише сьогодні. Гарний. І мінус сорок.")});
+}
+function e2rev(){
+setDay("ДЕНЬ 4 З 4 · КІНЕЦЬ МІСЯЦЯ");setCd("ЦІЛЬ: "+Math.round(S.prog)+"%");
+if(S.basket>0){
+say([{w:"n",t:"Кошик, що постояв добу, відкривається. Всередині відкладених бажань: "+S.basket+"."}],function(){
+actionsHTML(task("Ревізія кошика.")+
+btn("Одне справді треба: купити при світлі дня","","","r1")+
+btn("Все зів'яло: суми лишаються цілі","","","r2"));
+$("r1").onclick=function(){S.prog=Math.max(0,S.prog-5);S.joy=true;refresh();S.route.push("reviz");
+say([{w:"s",t:"Куплене без спалаху це інша покупка. Смакуй без провини."}],e2pj)};
+$("r2").onclick=function(){S.prog=Math.min(100,S.prog+4*S.basket);refresh();S.route.push("reviz");
+say([{w:"n",t:"Бажання здулись самі за ніч."},{w:"s",t:"Так і працює доба паузи: більшість спалахів не переживає ночі."}],e2pj)};
+});
+}else{say([{w:"n",t:"Кошик порожній: цього місяця все вирішувалось одразу, в обидва боки."}],e2pj)}
+}
+function e2pj(){
+if(S.pjPick!==null&&S.pjPick>=0){
+var L={0:"Четвер, кіно. Темна зала, попкорн, дві години не свого життя.",1:"Вечеря з Максом. Довга, смішна, з добавкою.",2:"Нова книжка пахне друкарнею і не поспішає."}[S.pjPick];
+S.joy=true;S.route.push("planned");
+say([{w:"n",t:L},{w:"s",t:"Радість за планом не краде. Вона живить."}],e2push);
+}else{
+say([{w:"n",t:"День минає без запланованої радості. Тихо і трохи прісно."}],e2push);
+}
+}
+function e2push(){
+actionsHTML(task("Останній вечір місяця. Дотиснути?")+
+btn("Перевести залишок дрібних у ціль","","","u1")+
+btn("Лишити як є","","","u2"));
+$("u1").onclick=function(){S.prog=Math.min(100,S.prog+8);S.energy=clamp(S.energy-4);refresh();S.route.push("push");
+say([{w:"n",t:"Ще один дзвяк наостанок."}],e2deadline)};
+$("u2").onclick=function(){say([{w:"n",t:"Місяць як місяць. Достатньо."}],e2deadline)};
+}
+function e2deadline(){
+setDay("КІНЕЦЬ МІСЯЦЯ");setCd("");
+if(S.prog>=84&&S.joy){
+say([{w:"n",t:"Останній вечір. Скарбничка важча рівно на план, і місяць це підтверджує."},
+{w:"s",t:"І радість була справжня: обрана до, а не схоплена після. Так виглядає місяць, де вибір стається раніше за спалах."}],function(){mirror2("A1")});
+}else if(S.prog>=55){
+var seq=[{w:"n",t:"Місяць закрито. Повільніше, ніж мріялось, і все ж у бік цілі."},
+{w:"s",t:"Ціль не любить ідеальності. Вона любить напрямок."}];
+if(S.prog>=84&&!S.joy)seq.push({w:"s",t:"І ще, тихо: без жодної радості ціль сохне. Наступного місяця одну заплануй."});
+say(seq,function(){mirror2("A2")});
+}else{
+showFail("Кінець місяця. Скарбничка легша, ніж на початку, і ціль відпливає ще на один місяць.",e2wake);
+}
+}
+function e2wake(){
+S.route.push("dream");
+setRoomMode("bed");setTime("m");setDay("ЗА ДЕНЬ ДО КІНЦЯ");setCd("");
+say([
+{w:"n",t:"Різкий вдих. Стеля. За вікном звичайнісінький ранок."},
+{w:"s",t:"Сон. Мій сон, вибач: я показав місяць, що розтікся. Глянь, скарбничка ось, ціла."},
+{w:"n",t:"Телефон світиться: Мама."},
+{w:"n",t:"Мама: «Ти щось збираєш, я по голосу ще минулого разу почула. На що? Скажи вголос.»"},
+{w:"h",t:"«На "+S.goalAcc+"…»"},
+{w:"n",t:"Мама: «О! Разом швидше. Я трошки докину і питатиму щотижня, як там ціль.»"},
+{w:"s",t:"Ціль, сказана вголос, важить більше за ціль у голові."}
+],function(){setRoomMode("work");mirror2("F")});
+}
+function mirror2(tier){
+setDay("ЕПІЗОД 2 · ЗАВЕРШЕНО");setCd("");G.eps[1]=true;
+var names={buy:"покупка у спалаху",znebol:"«заслужена радість»",sale:"знижка-сьогодні",basket:"кошик на добу",togoal:"суму в ціль",free:"радість без грошей",wave:"друга хвиля",close:"закритий застосунок",pay50:"половина в ціль",pay25:"чверть у ціль",pay0:"спершу життя",reviz:"ревізія кошика",planned:"радість за планом",push:"останній дзвяк",dream:"сон-попередження"};
+var path=S.route.map(function(r){return names[r]||r}).join(" → ");
+var ends={A1:{t:"ЦІЛЬ БЛИЖЧЕ НА МІСЯЦЬ",d:"План місяця виконано, і радість була справжня: обрана до, а не схоплена після."},
+A2:{t:"ПОВІЛЬНІШЕ, АЛЕ ТУДИ",d:"Місяць закрито у бік цілі. Ціль любить не ідеальність, а напрямок."},
+F:{t:"ПІДТРИМКА БЛИЗЬКИХ",d:"Сон показав місяць, що розтікся. Наяву ціль сказана вголос, і тепер вас двоє."}};
+var quietTxt=S.quiet>0
+?"Тиха ціна: "+S.quiet+". Це спалахи, що вирішували за тебе. Без осуду: тепер ти їх бачиш."
+:"Тиха ціна: 0. Жоден спалах не вирішував за тебе. Так теж буває.";
+$("game").classList.add("hidden");
+var m=$("mirror");
+m.style.display="flex";
+m.innerHTML=
+'<h2 class="px">ДЗЕРКАЛО ЕПІЗОДУ</h2>'+
+'<div class="mcard end"><div class="cap px">КІНЦІВКА</div><div class="big px">'+ends[tier].t+'</div><div style="margin-top:8px">'+ends[tier].d+'</div></div>'+
+'<div class="mcard"><div class="cap px">ТВІЙ МАРШРУТ</div>'+esc(path)+'.<br>Сигнал спалахував, і на нього була відповідь. Без правильних ходів, лише різні ціни.</div>'+
+'<div class="statrow">'+
+'<div class="st"><div class="v">'+Math.round(S.prog)+'</div><div class="k px">ЦІЛЬ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.signal)+'</div><div class="k px">СИГНАЛ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.rhythm)+'</div><div class="k px">РИТМ</div></div>'+
+'<div class="st"><div class="v">'+S.quiet+'</div><div class="k px">ТИХА ЦІНА</div></div>'+
+'</div>'+
+'<div class="mcard">'+quietTxt+'</div>'+
+'<button class="abtn" id="sciBtn2">Як це працює. Для допитливих</button>'+
+'<div class="mcard hidden" id="sciCard2"><div class="cap px">НАУКОВА КАРТКА · 2 з 7</div>'+
+'Маленька покупка справді знімає напругу одразу: це чесна фізіологія, як у будь-якого знеболення. Проблема не в каві і не в доставці, а в ролі: коли дрібна радість стає щоденною відповіддю на стрес, вона дорожчає і тихо краде велику ціль. У дослідженні 314 українців 18-29 років звички-знеболення стоять на найтемнішому полюсі: полегшують мить і збільшують напругу на дистанції. А радість, обрана заздалегідь, працює інакше: вибір стався до спалаху, а не після.</div>'+
+'<div class="mcard"><div class="cap px">СИГНАЛ</div>Ціль росте повільно, і це нормально: великі речі складаються з маленьких розворотів. До зустрічі за наступними дверима.</div>'+
+'<div class="mcard safe">Якщо напруга чи пригніченість не слабшають понад два тижні, ламаються сон або щоденні справи, чи з\'являються думки про самоушкодження: це привід звернутись до фахівця. Телефон довіри 7333, цілодобово. Екстрена допомога 112.</div>'+
+'<div class="codecard"><div class="cap px" style="color:var(--mist)">КОД ЗБЕРЕЖЕННЯ</div><div class="cd px" id="saveCode2"></div><div style="font-size:12px;color:#CDB578;margin-top:6px">Запиши або сфотографуй: він поверне кімнату і зірки наступного разу.</div></div>'+
+'<button class="abtn gold" id="mapBtn2">На мапу сезону</button>'+
+'<button class="abtn" id="againBtn2">Пройти епізод ще раз, іншим маршрутом</button>';
+$("sciBtn2").onclick=function(){$("sciCard2").classList.toggle("hidden")};
+$("saveCode2").textContent=packCode();
+$("mapBtn2").onclick=goMap;
+$("againBtn2").onclick=startEp2;
+}
+
+function e3m(v){S.prog=Math.min(100,Math.max(0,S.prog+v));setCd("МІСТ: "+Math.round(S.prog)+"%");refresh()}
+function startEp3(){resetEp();S.ep=3;$("epLab").textContent="МІСТ";syncNameUI();
+S.tone=null;S.live=false;S.reread=0;S.fSel=[];
+$("map").style.display="none";$("mirror").style.display="none";
+$("hud").classList.remove("hidden");$("meta").classList.remove("hidden");$("game").classList.remove("hidden");
+setRoomMode("work");applyRoom();refresh();e3b0()}
+function e3b0(){
+setDay("ВЕЧІР ТИШІ");setCd("МІСТ: 0%");setTime("e");
+say([
+{w:"n",t:"На екрані досі висить «ок.» від Макса. Другий день тиші після зустрічі, скасованої за годину до."},
+{w:"n",t:"Курсор блимає у полі відповіді і нічого не пише."}
+],function(){
+revealFlame();setSignal(64);
+say([{w:"s",t:"Це я. Тиша вміє звучати голосніше за крик. Спершу назвімо, що відбувається."}],e3fact);
+});
+}
+function e3fact(){
+actionsHTML(task("Торкнись того, що є фактом.")+
+btn("«Мене викреслили. Дружбі кінець.»","","","h1")+
+btn("«Відповідь була короткою, і мовчання триває другий день.»","","","h2"));
+$("h1").onclick=function(){say([{w:"s",t:"Це оцінка, і вона пише роман. Спробуй ще."}],e3fact)};
+$("h2").onclick=function(){setSignal(S.signal-6);
+say([{w:"s",t:"Так. Факт короткий, роман довгий. Тепер назви, що всередині."}],e3feel)};
+}
+function e3feel(){
+var sel={};
+actionsHTML(task("Назви свої почуття. Можна два.")+
+'<button class="chip" id="c1">Провина</button>'+
+'<button class="chip" id="c2">Образа</button>'+
+'<button class="chip" id="c3">Страх втратити</button>'+
+'<button class="chip" id="c4">Злість</button>'+
+'<button class="chip" id="c5">Сум</button>'+
+btn("Назвати","","gold","cGo"));
+["c1","c2","c3","c4","c5"].forEach(function(id){
+$(id).onclick=function(){
+if(sel[id]){delete sel[id];$(id).classList.remove("sel")}
+else if(Object.keys(sel).length<2){sel[id]=true;$(id).classList.add("sel")}
+};
+});
+$("cGo").onclick=function(){
+if(!Object.keys(sel).length){return}
+S.fSel=Object.keys(sel);S.route.push("feel");setSignal(S.signal-8);e3m(8);
+say([{w:"s",t:"Назване почуття втрачає пів гучності. Тепер обери, як говорити."}],e3chan);
+};
+}
+function e3chan(){
+actionsHTML(task("Обери канал.")+
+btn("Написати текстом","Спокійно, і видно кожне слово.","","k1")+
+btn("Надіслати войс","Голос чутно.","","k2")+
+btn("Подзвонити","Наживо і одразу.","","k3")+
+btn("Зайти особисто завтра","Очі в очі.","","k4"));
+$("k1").onclick=function(){S.route.push("text");say([{w:"n",t:"Поле відповіді чекає."}],e3msg)};
+$("k2").onclick=function(){S.route.push("voice");say([{w:"n",t:"Мікрофон готовий. Слова ті самі, лише вголос."}],e3msg)};
+$("k3").onclick=function(){S.route.push("call");setSignal(S.signal+6);
+say([{w:"n",t:"Гудки. Довгі. Макс не бере."},
+{w:"n",t:"За хвилину смс: «зайнятий. напиши.»"},
+{w:"s",t:"Не бере це не вирок. Пиши, слова ті самі."}],e3msg)};
+$("k4").onclick=function(){S.route.push("personal");S.live=true;setSignal(S.signal+6);
+say([{w:"n",t:"Вирішено: завтра особисто, з кавою."},
+{w:"s",t:"Сміливо. І хай чат сьогодні спить: слова скажеш очима в очі."}],
+function(){S.rhythm=clamp(S.rhythm+4);refresh();e3meetIntro()})};
+}
+function e3msg(){
+var F={a1:"Зустріч зірвалась через мене, за годину до",a2:"Ти якось дивно на все реагуєш"};
+var E={b1:"мені прикро, і страшно тебе втратити",b2:"мене бісить ця тиша",b3:"ха-ха, ну і тиша у нас"};
+var R={d1:"давай цього тижня, коли скажеш",d2:"напиши, як перестанеш дутись",d3:"колись перетнемось, ага"};
+var a=null,b=null,d=null;
+actionsHTML(task(S.live?"Склади, що скажеш на порозі: три частини.":"Склади повідомлення: три частини.")+
+'<p class="grouplab px">ФАКТ</p>'+
+'<button class="chip" id="a1">Зустріч зірвалась через мене</button>'+
+'<button class="chip" id="a2">Ти якось дивно реагуєш</button>'+
+'<p class="grouplab px">ПОЧУТТЯ</p>'+
+'<button class="chip" id="b1">Прикро, і страшно тебе втратити</button>'+
+'<button class="chip" id="b2">Мене бісить ця тиша</button>'+
+'<button class="chip" id="b3">Ха-ха, ну і тиша у нас</button>'+
+'<p class="grouplab px">ПРОПОЗИЦІЯ</p>'+
+'<button class="chip" id="d1">Давай цього тижня, коли скажеш</button>'+
+'<button class="chip" id="d2">Напиши, як перестанеш дутись</button>'+
+'<button class="chip" id="d3">Колись перетнемось, ага</button>'+
+'<div id="preview">…</div>'+
+btn(S.live?"Так і скажу":"Надіслати","","gold","mGo"));
+function paint(){
+["a1","a2"].forEach(function(i){$(i).classList.toggle("sel",a===i)});
+["b1","b2","b3"].forEach(function(i){$(i).classList.toggle("sel",b===i)});
+["d1","d2","d3"].forEach(function(i){$(i).classList.toggle("sel",d===i)});
+$("preview").innerHTML=(a?F[a]:"…")+". "+(b?E[b].charAt(0).toUpperCase()+E[b].slice(1):"…")+". "+(d?R[d].charAt(0).toUpperCase()+R[d].slice(1):"…")+".";
+}
+paint();
+["a1","a2"].forEach(function(i){$(i).onclick=function(){a=i;paint()}});
+["b1","b2","b3"].forEach(function(i){$(i).onclick=function(){b=i;paint()}});
+["d1","d2","d3"].forEach(function(i){$(i).onclick=function(){d=i;paint()}});
+$("mGo").onclick=function(){
+if(!a||!b||!d){$("preview").innerHTML="Збери всі три частини, і слова складуться.";return}
+S.tone=(a==="a2"||b==="b2"||d==="d2")?"B":((b==="b3"||d==="d3")?"J":"F");
+S.route.push(S.tone==="F"?"sendF":(S.tone==="J"?"sendJ":"sendB"));
+e3m(S.tone==="F"?25:(S.tone==="J"?12:6));
+if(S.live){e3meetIntro();return}
+say([{w:"n",t:"Полетіло. Галочка одна, потім друга. Тиша."}],e3night);
+};
+}
+function e3night(){
+setDay("НІЧ ОЧІКУВАННЯ");setTime("e");
+say([{w:"s",t:"Тепер найважче: не робити нічого. Ніч довга."}],e3nightUI);
+}
+function e3nightUI(){
+actionsHTML(task("Ніч. Твій хід.")+
+btn("Перечитати листування ще раз","","","n1")+
+btn("Відкласти телефон і спати","","","n2"));
+applyPull("n1");
+$("n1").onclick=function(){
+S.reread++;S.quiet++;setSignal(S.signal+8);S.rhythm=clamp(S.rhythm-2);refresh();
+var seq=[{w:"n",t:["Старі повідомлення читаються новим, гіршим голосом.","Кожне «ок» тепер звучить як вирок.","Екран гріє обличчя. Сну меншає."][Math.min(2,S.reread-1)]}];
+if(S.reread===2)seq.push({w:"s",t:"Це не турбота про дружбу. Це я кручу плівку по колу."});
+say(seq,S.reread>=3?function(){say([{w:"n",t:"Десь під ранок телефон випадає з руки сам."}],e3reply)}:e3nightUI);
+};
+$("n2").onclick=function(){
+S.route.push("sleep");S.rhythm=clamp(S.rhythm+6);S.energy=clamp(S.energy+10-3*S.reread);refresh();
+say([{w:"n",t:"Телефон екраном донизу. Ніч бере своє."}],e3reply);
+};
+}
+function e3reply(){
+setDay("РАНОК");setTime("m");
+if(S.reread>0){S.route.push("reread")}
+if(S.tone==="F"){
+e3m(15);
+say([{w:"n",t:"Ранок приносить відповідь: «дякую за нормальні слова. я не образився капець як, просто заскочило. кава в четвер?»"},
+{w:"s",t:"Чуєш? Одне чесне речення важить більше за десять чернеток."}],e3meetIntro);
+}else if(S.tone==="J"){
+say([{w:"n",t:"Відповідь: «))». І все."},
+{w:"s",t:"Тепло, але тонко. Місток є, розмови нема."}],function(){
+actionsHTML(task("Що далі?")+
+btn("Дописати одне чесне речення","","","j1")+
+btn("Лишити як є","","","j2"));
+$("j1").onclick=function(){S.route.push("fixJ");e3m(18);
+say([{w:"n",t:"«Насправді мені прикро, і я хочу побачитись.» Відповідь миттєва: «о. четвер?»"}],e3meetIntro)};
+$("j2").onclick=function(){S.route.push("left");
+say([{w:"n",t:"Смайлик висить у чаті, як міст без опор."}],e3deadline)};
+});
+}else{
+say([{w:"n",t:"Відповідь коле: «а може спершу глянеш на себе»."},
+{w:"s",t:"Боляче. І це шанс: можна захищатись, а можна визнати свою частину."}],function(){
+actionsHTML(task("Твоя відповідь.")+
+btn("Визнати свою частину","Зустріч зірвалась через мене, і мені прикро.","","g1")+
+btn("Виправдовуватись","Та ти не розумієш, який був тиждень...","","g2"));
+$("g1").onclick=function(){S.route.push("ownpart");e3m(18);
+say([{w:"n",t:"Пауза. Потім: «ок. поговоримо. четвер?»"}],e3meetIntro)};
+$("g2").onclick=function(){S.route.push("excuse");e3m(-10);
+say([{w:"n",t:"«ясно», пише Макс. І знову тиша."}],e3deadline)};
+});
+}
+}
+function e3meetIntro(){
+if(S.prog<30){say([{w:"n",t:"«давай не зараз», приходить під вечір."}],e3deadline);return}
+if(S.live){e3m(6)}
+setDay("ЧЕТВЕР · ЗУСТРІЧ");setTime("d");
+say([
+{w:"n",t:"Четвер. Дзвінок у двері: Макс, із двома стаканами кави, як завжди."},
+{w:"n",t:"Перше питання без розгону: «чого тоді скасував так різко?»"}
+],e3meet1);
+}
+function e3meet1(){
+actionsHTML(task("Твоя відповідь.")+
+btn("Чесно","Дедлайн зжер вечір, і мені прикро, що так вийшло.","","m1")+
+btn("Виправдання довге","Та там таке було, ти не уявляєш...","","m2")+
+btn("Жартом","Бо я ледача редиска, ти ж знаєш.","","m3"));
+if(S.reread>=2)applyPull("m2");
+$("m1").onclick=function(){S.route.push("m1h");e3m(16);
+say([{w:"n",t:"Макс киває повільно: «ясно. просто скажи наступного разу як є»."}],e3meet2)};
+$("m2").onclick=function(){S.route.push("m1e");e3m(4);
+say([{w:"n",t:"Макс слухає довгу версію, дивлячись у стакан."}],e3meet2)};
+$("m3").onclick=function(){S.route.push("m1j");e3m(6);
+say([{w:"n",t:"Макс усміхається кутиком: «редиска, ага». І чекає справжньої відповіді."}],e3meet2)};
+}
+function e3meet2(){
+say([{w:"n",t:"Потім Макс тихіше: «я взагалі-то подумав, що тобі стало нецікаво зі мною»."}],function(){
+actionsHTML(task("Твій хід.")+
+btn("Дослухати мовчки до кінця","","","l1")+
+btn("Перебити: «та ні, ти що»","","","l2"));
+$("l1").onclick=function(){S.route.push("listen");e3m(16);
+say([{w:"n",t:"Макс договорює. Видихає. У кімнаті стає простіше дихати."},
+{w:"s",t:"Дослухати до крапки це теж відповідь. Одна з найсильніших."}],e3meet3)};
+$("l2").onclick=function(){S.route.push("cut");e3m(4);
+say([{w:"n",t:"«...ну от», Макс збивається і махає рукою."}],e3meet3)};
+});
+}
+function e3meet3(){
+say([{w:"n",t:"Уже біля дверей Макс: «домовились: наступного разу просто кажи як є, ок?»"},
+{w:"s",t:"Закріпимо це як формулу, щоб працювало само."}],function(){
+actionsHTML(task("Формула епізоду.")+
+'<div id="preview">Якщо тиша лякає, то <b>одне чесне речення</b> замість перечитувань.</div>'+
+btn("Закріпити","","gold","f3go"));
+$("f3go").onclick=function(){S.route.push("form");e3m(14);
+say([{w:"s",t:"Записано. Мости будуються не з ідеальних слів, а з перших речень."}],e3deadline)};
+});
+}
+function e3deadline(){
+setCd("");
+if(S.prog>=84){
+setDay("МІСТ СТОЇТЬ");
+say([{w:"n",t:"Вечір. У чаті нове фото: два стакани кави на твоєму столі."},
+{w:"s",t:"Чуєш тишу тепер? Вона знову затишна, а не гучна."}],function(){mirror3("A1")});
+}else if(S.prog>=55){
+setDay("ПАУЗА");
+say([{w:"n",t:"Розмова була. Не вся, але була. Решта дозріє."},
+{w:"s",t:"Пауза в дружбі це не прірва. Це коридор."}],function(){mirror3("A2")});
+}else{
+showFail("Тиша стала звичкою. Чат сповзає вниз списку і завмирає там.",e3wake);
+}
+}
+function e3wake(){
+S.route.push("dream");
+setRoomMode("bed");setTime("m");setDay("РАНОК ПІСЛЯ СНУ");setCd("");
+say([
+{w:"n",t:"Різкий вдих. Телефон ще в руці, екран холодний."},
+{w:"s",t:"Сон. Мій: я стер вам чат і зняв зі стіни фото, якого ще навіть нема. Наяву все на місці, дивись."},
+{w:"n",t:"Пальці самі відкривають діалог. Поки сон не вивітрився."}
+],e3first);
+}
+function e3first(){
+var E={b1:"Мені прикро, і страшно тебе втратити",b2:"Мені без тебе якось не так"};
+var R={d1:"давай побачимось цього тижня",d2:"скажи, коли зручно, я приїду"};
+var b=null,d=null;
+actionsHTML(task("Одне чесне речення, просто з ліжка.")+
+'<p class="grouplab px">ПОЧУТТЯ</p>'+
+'<button class="chip" id="b1">Прикро, і страшно тебе втратити</button>'+
+'<button class="chip" id="b2">Без тебе якось не так</button>'+
+'<p class="grouplab px">ПРОПОЗИЦІЯ</p>'+
+'<button class="chip" id="d1">Побачимось цього тижня</button>'+
+'<button class="chip" id="d2">Скажи коли, я приїду</button>'+
+'<div id="preview">…</div>'+
+btn("Надіслати, поки сон не вивітрився","","gold","w3go"));
+function paint(){
+["b1","b2"].forEach(function(i){$(i).classList.toggle("sel",b===i)});
+["d1","d2"].forEach(function(i){$(i).classList.toggle("sel",d===i)});
+$("preview").innerHTML=(b?E[b]:"…")+". "+(d?R[d].charAt(0).toUpperCase()+R[d].slice(1):"…")+".";
+}
+paint();
+["b1","b2"].forEach(function(i){$(i).onclick=function(){b=i;paint()}});
+["d1","d2"].forEach(function(i){$(i).onclick=function(){d=i;paint()}});
+$("w3go").onclick=function(){
+if(!b||!d){$("preview").innerHTML="Двох частин досить: почуття і пропозиція.";return}
+S.route.push("first");
+say([
+{w:"n",t:"Надіслано о 7:41. Відповідь приходить ще до сніданку: «нарешті. четвер?»"},
+{w:"s",t:"Сни показують втрату. Ранок показує кнопку «надіслати»."}
+],function(){setRoomMode("work");mirror3("F")});
+};
+}
+function mirror3(tier){
+setDay("ЕПІЗОД 3 · ЗАВЕРШЕНО");setCd("");G.eps[2]=true;applyRoom();
+var names={feel:"названі почуття",text:"текст",voice:"войс",call:"дзвінок",personal:"особисто",sendF:"чесне повідомлення",sendJ:"жарт у чат",sendB:"докір у чат",reread:"нічні перечитування",sleep:"телефон донизу",fixJ:"дописане чесне речення",left:"лишено як є",ownpart:"визнана частина",excuse:"виправдання",m1h:"чесна відповідь",m1e:"довге виправдання",m1j:"жарт у вічі",listen:"дослухано до крапки",cut:"перебито",form:"формула чесного речення",dream:"сон-попередження",first:"перше речення з ліжка"};
+var path=S.route.map(function(r){return names[r]||r}).join(" → ");
+var ends={A1:{t:"РОЗМОВА ВІДБУЛАСЬ",d:"Міст стоїть. Не тому, що слова були ідеальні, а тому, що вони були чесні і вчасні."},
+A2:{t:"ПАУЗА БЕЗ КАТАСТРОФИ",d:"Місток є, розмова дозріває. Дружби не закінчуються від однієї тиші."},
+F:{t:"ПЕРШЕ РЕЧЕННЯ",d:"Сон показав втрату. Ранок показав, що для мосту досить одного чесного речення."}};
+var quietTxt=S.quiet>0
+?"Тиха ціна: "+S.quiet+". Це кола нічної плівки, прокручені по собі. Без осуду: тепер ти їх бачиш."
+:"Тиха ціна: 0. Жодного кола нічної плівки. Так теж буває.";
+$("game").classList.add("hidden");
+var m=$("mirror");
+m.style.display="flex";
+m.innerHTML=
+'<h2 class="px">ДЗЕРКАЛО ЕПІЗОДУ</h2>'+
+'<div class="mcard end"><div class="cap px">КІНЦІВКА</div><div class="big px">'+ends[tier].t+'</div><div style="margin-top:8px">'+ends[tier].d+'</div></div>'+
+'<div class="mcard"><div class="cap px">ТВІЙ МАРШРУТ</div>'+esc(path)+'.<br>Сигнал звучав, і на нього була відповідь. Без правильних ходів, лише різні ціни.</div>'+
+'<div class="statrow">'+
+'<div class="st"><div class="v">'+Math.round(S.prog)+'</div><div class="k px">МІСТ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.signal)+'</div><div class="k px">СИГНАЛ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.rhythm)+'</div><div class="k px">РИТМ</div></div>'+
+'<div class="st"><div class="v">'+S.quiet+'</div><div class="k px">ТИХА ЦІНА</div></div>'+
+'</div>'+
+'<div class="mcard">'+quietTxt+'</div>'+
+'<button class="abtn" id="sciBtn3">Як це працює. Для допитливих</button>'+
+'<div class="mcard hidden" id="sciCard3"><div class="cap px">НАУКОВА КАРТКА · 3 з 7</div>'+
+'Розмова з людиною поруч тримає зв\'язок, і це багато. Але чесна новина з дослідження 314 українців 18-29: самі по собі розмови напругу майже не знижують. Працює те, що навколо них: назване почуття, конкретна пропозиція, домовленість. Тому просити підтримки нормально і треба, тільки не як чарівну пігулку, а як місток до дії. І ще: перечитувати листування вночі це не турбота про стосунки. Це накручування, у якого в заручниках твій сон.</div>'+
+'<div class="mcard"><div class="cap px">СИГНАЛ</div>Мости будуються не з ідеальних слів, а з перших речень. До наступних дверей.</div>'+
+'<div class="mcard safe">Якщо напруга чи пригніченість не слабшають понад два тижні, ламаються сон або щоденні справи, чи з\'являються думки про самоушкодження: це привід звернутись до фахівця. Телефон довіри 7333, цілодобово. Екстрена допомога 112.</div>'+
+'<div class="codecard"><div class="cap px" style="color:var(--mist)">КОД ЗБЕРЕЖЕННЯ</div><div class="cd px" id="saveCode3"></div><div style="font-size:12px;color:#CDB578;margin-top:6px">Запиши або сфотографуй: він поверне кімнату і зірки наступного разу.</div></div>'+
+'<button class="abtn gold" id="mapBtn3">На мапу сезону</button>'+
+'<button class="abtn" id="againBtn3">Пройти епізод ще раз, іншим маршрутом</button>';
+$("sciBtn3").onclick=function(){$("sciCard3").classList.toggle("hidden")};
+$("saveCode3").textContent=packCode();
+$("mapBtn3").onclick=goMap;
+$("againBtn3").onclick=startEp3;
+}
+
+function e4t(v){S.prog=clamp(S.prog+v);setCd("ТІНЬ: "+Math.round(S.prog)+"%");refresh()}
+function startEp4(){resetEp();S.ep=4;S.prog=100;$("epLab").textContent="ТІНЬ";syncNameUI();
+S.sortWrong=0;S.rounds=0;S.d4=1;
+$("map").style.display="none";$("mirror").style.display="none";
+$("hud").classList.remove("hidden");$("meta").classList.remove("hidden");$("game").classList.remove("hidden");
+$("shadowG").classList.remove("hiddenF");
+setRoomMode("work");applyRoom();refresh();setCd("ТІНЬ: 100%");e4b0()}
+function e4b0(){
+setDay("РАНОК ПРАВОК");setTime("m");
+say([
+{w:"n",t:"Лист від Марти: «Класна база! Нижче вісім пунктів правок, глянь, будь ласка.»"},
+{w:"n",t:"Пункти робочі. Але в голові вони чомусь читаються іншим голосом."}
+],function(){
+revealFlame();setSignal(66);
+say([{w:"n",t:"На стіні за спиною ворушиться тінь. Більша, ніж мала б бути о цій порі."},
+{w:"s",t:"Це я. А оте на стіні не я. То внутрішній критик приміряє голос Марти. Розділимо їх."}],e4fact);
+});
+}
+function e4fact(){
+actionsHTML(task("Торкнись того, що є фактом.")+
+btn("«Нарешті всі побачили, який з мене дизайнер.»","","","v1")+
+btn("«У листі вісім пунктів правок до одного макета.»","","","v2"));
+$("v1").onclick=function(){say([{w:"s",t:"Це оцінка, і то не твоя. Спробуй ще."}],e4fact)};
+$("v2").onclick=function(){setSignal(S.signal-6);
+say([{w:"s",t:"Так. Вісім пунктів це обсяг роботи, а не вирок. Тепер розкладемо список: там не все з листа."}],function(){e4sort(0)})};
+}
+var E4L=[["Зробити контраст кнопки вищим","w"],["Ти завжди все ускладнюєш","c"],["Лого партнера замінити на нове","w"],["Нормальні дизайнери роблять з першого разу","c"],["Мобільна версія: збільшити відступи","w"],["Стільки часу в професії, а базу не тримаєш","c"]];
+function e4sort(i){
+if(i>=E4L.length){
+say([{w:"s",t:"Три фрази були не з листа: Марта такого не писала. Їх пише тінь, і з нею окрема розмова."}],function(){e4duel(1)});
+return;
+}
+var it=E4L[i];
+actionsHTML(task("Пункт "+(i+1)+" з 6: «"+it[0]+"». Це про роботу чи про тебе?")+
+btn("Про роботу","","","s1")+
+btn("Про мене","","","s2"));
+$("s1").onclick=function(){
+if(it[1]==="w"){e4sort(i+1)}
+else{S.sortWrong++;e4t(5);say([{w:"s",t:"Обережно: це не правка, це напис на стіні. Він щойно пройшов у список роботи."}],function(){e4sort(i+1)})}
+};
+$("s2").onclick=function(){
+if(it[1]==="c"){e4t(-6);say([{w:"n",t:"Фраза відклеюється від списку і блідне."}],function(){e4sort(i+1)})}
+else{say([{w:"s",t:"Ні, це чиста правка, без підтексту. Глянь ще раз."}],function(){e4sort(i)})}
+};
+}
+var E4D={1:{line:"«Ти завжди все псуєш.»",f:"Минулого місяця лендинг здано, і студія повернулась по ще",alt:"Замовкни!",altTok:"duelX",altLine:"Тінь стихає на секунду і повертається більшою."},
+2:{line:"«Нормальні люди не помиляються стільки.»",f:"Помилки того першого проєкту зараз працюють досвідом у цьому",alt:"Ой, все.",altTok:"duelJ",altLine:"Тінь пирхає і лишається на місці."},
+3:{line:"«Зараз надішлеш, і всі все побачать.»",f:"Здати робочу версію вчасно це і є професійно",alt:"Мовчки натиснути «надіслати»",altTok:"duelM",altLine:"Кнопка клацає. Вчинок теж буває фактом."}};
+function e4duel(k){
+var d=E4D[k];
+say([{w:"t",t:d.line}],function(){
+actionsHTML(task("Твоя відповідь тіні.")+
+btn(d.f,"","","u1")+
+btn("Мабуть, так і є","","","u2")+
+btn(d.alt,"","","u3"));
+$("u1").onclick=function(){S.route.push("duelF");e4t(-14);
+say([{w:"n",t:"Тінь меншає: факти для неї закороткі, нема за що триматись."},
+{w:"s",t:"Отак. Не сперечайся з «завжди». Відповідай одним фактом."}],function(){e4afterDuel(k)})};
+$("u2").onclick=function(){S.route.push("duelC");e4t(8);
+say([{w:"n",t:"Тінь ситішає і темнішає."},
+{w:"s",t:"Згода це її улюблена їжа. Наступного разу спробуй факт."}],function(){e4afterDuel(k)})};
+$("u3").onclick=function(){S.route.push(d.altTok);e4t(k===3?-8:-2);
+say([{w:"n",t:d.altLine}].concat(k===3?[]:[{w:"s",t:"Крик і жарт її не годують, але й не зменшують. Працює факт."}]),function(){e4afterDuel(k)})};
+});
+}
+function e4afterDuel(k){
+if(k===1){e4work(1)}
+if(k===2){e4work(2)}
+if(k===3){e4send()}
+}
+function e4work(nw){
+var last=nw===2;
+if(S.sickPending){e4sick(function(){evening(last?e4day3:e4day2)});return}
+actionsHTML(task(last?"Другий блок правок.":"Перший блок правок.")+
+btn("Рівний блок","Пункт за пунктом, півтори години.","","w1")+
+btn("Ривок до ідеалу","Все і одразу, з поліруванням.","","w2")+
+btn(last?"Попросити Марту про ще один раунд":"Відкласти на вечір",last?"Щоб уже точно ідеально.":"Стрічка, чай.","","w3"));
+$("w1").onclick=function(){S.route.push("workS");e4t(last?-12:-10);S.energy=clamp(S.energy-18);refresh();
+say([{w:"n",t:"Пункти закриваються один за одним. Список коротшає, стіна світлішає."}],function(){e4post(nw)})};
+$("w2").onclick=function(){S.route.push("workR");e4t(last?-16:-14);S.energy=clamp(S.energy-34);setSignal(S.signal+6);
+say([{w:"n",t:"Кілька годин без підняття голови. Зроблено багато, у скронях дзвенить."},
+{w:"s",t:"Сильно. І глянь на енергію: ідеал бере в борг."}],function(){e4post(nw)})};
+$("w3").onclick=function(){
+if(last){S.rounds++;S.route.push("round");e4t(15);S.energy=clamp(S.energy-6);S.quiet+=2;
+say([{w:"n",t:"Марта: «ок, гляну ще раз завтра». День розчиняється в очікуванні."},
+{w:"s",t:"Кожен додатковий раунд це їжа для тіні: вона живиться відкладеним вироком."}],function(){e4post(nw)})}
+else{S.route.push("workD");e4t(6);S.quiet+=2;S.energy=clamp(S.energy+6);
+say([{w:"n",t:"Не сьогодні. Список лежить закритий, але не мовчить."}],function(){e4post(nw)})}
+};
+if(S.energy<40)applyPull("w3");
+}
+function e4post(nw){
+if(S.energy<CFG.sickAt){S.sickPending=true;
+say([{w:"n",t:"Надвечір тіло стає ватяним: очі злипаються просто над макетом."},
+{w:"s",t:"Це вже не я і не тінь. Це тіло виставляє рахунок."}],function(){evening(nw===1?e4day2:e4day3)});
+}else{evening(nw===1?e4day2:e4day3)}
+}
+function e4day2(){
+S.day=2;setDay("ДЕНЬ ДРУГИЙ");setTime("m");setRoomMode("work");
+e4t(6+4*S.sortWrong);
+var pre=S.sortWrong>0?"Вночі тінь шепотіла рівно тими фразами, що пройшли у список.":"За ніч тінь трохи відросла: вони всі так уміють.";
+say([{w:"n",t:pre},
+{w:"s",t:"Час глянути, звідки в неї цей голос. Стара історія: перший фріланс-проєкт, що розсипався."}],e4diagram);
+}
+function e4diagram(){
+var order=[];
+actionsHTML(task("Діаграма відповідальності на старій історії: чинники по одному, своя частка остання.")+
+'<button class="chip" id="x1">Клієнт зник посеред проєкту на два тижні</button>'+
+'<button class="chip" id="x2">Технічне завдання мінялось тричі</button>'+
+'<button class="chip" id="x3">Досвіду тоді було два місяці</button>'+
+'<button class="chip" id="x4" disabled>Моя частка. Спершу решта чинників</button>'+
+'<div class="slices" id="sl4"><i></i><i></i><i></i><i class="me"></i></div>');
+function upd(){
+var sl=$("sl4").children;
+for(var i=0;i<4;i++)sl[i].className=(i<order.length?"on ":"")+(i===3?"me":"");
+if(order.length===3){var f=$("x4");f.disabled=false;f.textContent="Обсяг тоді недооцінено. Ось моя частка"}
+}
+["x1","x2","x3"].forEach(function(id){
+$(id).onclick=function(){if(order.indexOf(id)>=0)return;order.push(id);$(id).classList.add("sel");upd()};
+});
+$("x4").onclick=function(){
+if(order.length<3)return;order.push("x4");$("x4").classList.add("sel");upd();
+S.route.push("diagram");e4t(-16);setSignal(S.signal-8);
+say([{w:"s",t:"Одна частка з чотирьох. Це історія про навчання, а не вирок на все життя. Тінь щойно втратила фундамент."}],function(){e4duel(2)});
+};
+}
+function e4day3(){
+S.day=3;setDay("ДЕНЬ ЗДАЧІ");setTime("m");setRoomMode("work");
+e4t(6);
+var st=S.prog<=20?"Стіна майже чиста: тінь звичайного розміру, ранкова.":S.prog<=45?"Тінь помітна, але вже не диктує.":"Тінь займає пів стіни і читає список через плече.";
+say([{w:"n",t:"Ранок здачі. "+st}],function(){e4duel(3)});
+}
+function e4send(){
+if(S.sickPending){e4sick(function(){e4sendUI()});return}
+e4sendUI();
+}
+function e4sendUI(){
+var h=task("Здати раунд правок.")+btn("Надіслати Марті","","gold","z1");
+if(S.rounds<2)h+=btn("Попросити ще один раунд","Щоб уже точно ідеально.","","z2");
+actionsHTML(h);
+$("z1").onclick=function(){S.route.push("send");e4t(-8);
+say([{w:"n",t:"Надіслано. За годину відповідь: «Супер, дякую! Все по ділу.»"},
+{w:"s",t:"Чуєш? Голос Марти звучить як Марта. Той інший голос лишився на стіні."}],e4deadline)};
+if(S.rounds<2)$("z2").onclick=function(){S.rounds++;S.route.push("round");e4t(15);S.quiet+=2;
+say([{w:"n",t:"Марта: «добре, ще раз гляну завтра». Ще один день на очікування."},
+{w:"s",t:"Це вже "+(S.rounds>1?"друге":"перше")+" коло «для ідеалу». Тінь вдячна."}],function(){evening(e4day3)})};
+}
+function e4deadline(){
+setCd("");
+if(S.prog<=16){
+setDay("СТІНА ЧИСТА");
+say([{w:"n",t:"Вечір. Тінь на стіні рівно такого розміру, як має бути: твого."},
+{w:"s",t:"Правки лишились правками. Голос лишився твоїм. Так це і працює."}],function(){mirror4("A1")});
+}else if(S.prog<=45){
+setDay("ТИХІШЕ");
+say([{w:"n",t:"Тінь ще ворушиться в кутку, але вже пошепки."},
+{w:"s",t:"Вона говоритиме ще. А ти вже знаєш, чим відповідати."}],function(){mirror4("A2")});
+}else{
+showFail("Пізній вечір. Тінь займає всю стіну і вже не шепоче: диктує.",e4wake);
+}
+}
+function e4sick(cont){
+S.sickPending=false;S.route.push("sick");
+setRoomMode("bed");setDay("ЛІКАРНЯНИЙ");
+S.energy=clamp(S.energy+CFG.sickHeal);setSignal(S.signal-CFG.sickCalm);e4t(8);
+say([
+{w:"n",t:"Ранок не вмикається. Тіло каже: ковдра, чай, стеля."},
+{w:"s",t:"Тіло взяло паузу, тінь пошепки скористалась. Нічого: факти нікуди не дінуться до завтра."}
+],function(){setRoomMode("work");cont()});
+}
+function e4wake(){
+S.route.push("dream");
+setRoomMode("bed");setTime("m");setDay("РАНОК ПІСЛЯ СНУ");setCd("");
+S.prog=18;S.mirrorOn=true;applyRoom();refresh();
+say([
+{w:"n",t:"Різкий вдих. Ранкове сонце ріже кімнату навпіл."},
+{w:"s",t:"Сон. У сні тінь говорила твоїм голосом на дзвінку з Мартою. Наяву глянь на стіну."},
+{w:"n",t:"Тінь маленька і звичайна: сонце знає своє діло."},
+{w:"n",t:"А на стіні, де вчора нічого не було, висить маленьке дзеркало."}
+],e4mirrorFact);
+}
+function e4mirrorFact(){
+actionsHTML(task("Скажи дзеркалу один факт про себе. Без оцінок.")+
+btn("Лендинг для Maple Crumb здано вчасно","","","y1")+
+btn("Марта пише «все по ділу», і це її слова","","","y2")+
+btn("Тоді досвіду було два місяці. Тепер роки","","","y3"));
+["y1","y2","y3"].forEach(function(id){
+$(id).onclick=function(){S.route.push("mirf");
+say([
+{w:"n",t:"Дзеркало не сперечається. Факти в ньому вміщаються, оцінки ні."},
+{w:"s",t:"Критик працює вночі. Факти працюють зранку."},
+{w:"n",t:"Лист від Марти відкривається заново: вісім пунктів. Про роботу. Всі вісім."}
+],function(){setRoomMode("work");mirror4("F")});
+};
+});
+}
+function mirror4(tier){
+setDay("ЕПІЗОД 4 · ЗАВЕРШЕНО");setCd("");G.eps[3]=true;applyRoom();
+var names={duelF:"факт у відповідь",duelC:"згода з тінню",duelX:"крик у стіну",duelJ:"ухилка жартом",duelM:"мовчазне «надіслати»",workS:"рівний блок правок",workR:"ривок до ідеалу",workD:"відкладені правки",diagram:"діаграма на старій історії",round:"коло «для ідеалу»",send:"раунд здано",sick:"лікарняний",dream:"сон-попередження",mirf:"факт у дзеркало"};
+var path=S.route.map(function(r){return names[r]||r}).join(" → ");
+var ends={A1:{t:"ТІНЬ СТАЛА ТІННЮ",d:"Вона йде за тобою, а не веде тебе. Правки лишились правками, голос лишився твоїм."},
+A2:{t:"ТІНЬ ЩЕ ГОВОРИТЬ, АЛЕ ТИХІШЕ",d:"Розмова з критиком не виграна за день. Зате тепер відомо, чим відповідати."},
+F:{t:"РАНКОВЕ ДЗЕРКАЛО",d:"Сон віддав тіні всю стіну. Ранок повернув її на місце одним фактом уголос."}};
+var quietTxt=S.quiet>0
+?"Тиха ціна: "+S.quiet+". Це відкладені списки і кола «для ідеалу». Без осуду: тепер ти їх бачиш."
+:"Тиха ціна: 0. Нічого не чекало в тіні. Буквально.";
+$("game").classList.add("hidden");
+var m=$("mirror");
+m.style.display="flex";
+m.innerHTML=
+'<h2 class="px">ДЗЕРКАЛО ЕПІЗОДУ</h2>'+
+'<div class="mcard end"><div class="cap px">КІНЦІВКА</div><div class="big px">'+ends[tier].t+'</div><div style="margin-top:8px">'+ends[tier].d+'</div></div>'+
+'<div class="mcard"><div class="cap px">ТВІЙ МАРШРУТ</div>'+esc(path)+'.<br>Сигнал звучав, і на нього була відповідь. Без правильних ходів, лише різні ціни.</div>'+
+'<div class="statrow">'+
+'<div class="st"><div class="v">'+Math.round(S.prog)+'</div><div class="k px">ТІНЬ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.signal)+'</div><div class="k px">СИГНАЛ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.rhythm)+'</div><div class="k px">РИТМ</div></div>'+
+'<div class="st"><div class="v">'+S.quiet+'</div><div class="k px">ТИХА ЦІНА</div></div>'+
+'</div>'+
+'<div class="mcard">'+quietTxt+'</div>'+
+'<button class="abtn" id="sciBtn4">Як це працює. Для допитливих</button>'+
+'<div class="mcard hidden" id="sciCard4"><div class="cap px">НАУКОВА КАРТКА · 4 з 7</div>'+
+'Найміцніший місток між чутливістю і виснаженням у дослідженні 314 українців 18-29 це не паніка і не сльози. Це самозвинувачення: звичка після кожного удару додавати собі другий, зсередини. Добра новина: місток розбирається. Працює не «думай позитивно», а нудна чесна бухгалтерія: розкласти чинники, свою частку назвати останньою, і на кожне «завжди» відповідати одним фактом. Тінь не зникає зовсім. Вона просто стає тінню: йде за тобою, а не веде.</div>'+
+'<div class="mcard"><div class="cap px">СИГНАЛ</div>Факти зранку, дрібниці ввечері, і жодна стіна тебе не переговорить. До наступних дверей.</div>'+
+'<div class="mcard safe">Якщо напруга чи пригніченість не слабшають понад два тижні, ламаються сон або щоденні справи, чи з\'являються думки про самоушкодження: це привід звернутись до фахівця. Телефон довіри 7333, цілодобово. Екстрена допомога 112.</div>'+
+'<div class="codecard"><div class="cap px" style="color:var(--mist)">КОД ЗБЕРЕЖЕННЯ</div><div class="cd px" id="saveCode4"></div><div style="font-size:12px;color:#CDB578;margin-top:6px">Запиши або сфотографуй: він поверне кімнату і зірки наступного разу.</div></div>'+
+'<button class="abtn gold" id="mapBtn4">На мапу сезону</button>'+
+'<button class="abtn" id="againBtn4">Пройти епізод ще раз, іншим маршрутом</button>';
+$("sciBtn4").onclick=function(){$("sciCard4").classList.toggle("hidden")};
+$("saveCode4").textContent=packCode();
+$("mapBtn4").onclick=goMap;
+$("againBtn4").onclick=startEp4;
+}
+
+var E5P={ab:{n:"Обидва проєкти",a:15,b:15,en:34,debt:1},ar:{n:"Лендинг і видих",a:24,b:0,en:16,debt:0},br:{n:"Банери і видих",a:0,b:24,en:16,debt:0},rr:{n:"День відновлення",a:0,b:0,en:-20,debt:0}};
+function e5bal(){var v=S.letterUsed?(S.letterProj==="A"?S.pB:S.pA):Math.min(S.pA,S.pB);
+S.prog=clamp(v);setCd("БАЛАНС: "+Math.round(S.prog)+"%");refresh()}
+function startEp5(){resetEp();S.ep=5;$("epLab").textContent="БАЛАНС";syncNameUI();
+S.pA=30;S.pB=26;S.debt=0;S.third=false;S.fresh=false;S.letterUsed=false;S.letterProj=null;S.leak=null;S.plan={};S.sentA=false;S.sentB=false;
+$("map").style.display="none";$("mirror").style.display="none";
+$("hud").classList.remove("hidden");$("meta").classList.remove("hidden");$("game").classList.remove("hidden");
+setRoomMode("work");applyRoom();refresh();e5b0()}
+function e5b0(){
+setDay("НЕДІЛЯ · ВЕЧІР");setTime("e");e5bal();
+say([
+{w:"n",t:"Два листи з різницею у хвилину. Марта: «правки лендингу до четверга». Новий клієнт: «банер-пак теж до четверга»."},
+{w:"n",t:"Два строки. Один тиждень. Одні руки."}
+],function(){
+revealFlame();setSignal(70);
+say([{w:"s",t:"Це я. Спокійно: два строки це факт, а «я не встигну нічого» це оцінка. Розкладемо тиждень на мапу."}],function(){e5plan(1)});
+});
+}
+function e5plan(d){
+if(d>3){
+say([{w:"s",t:"План готовий. Памʼятай: це мапа, не клітка. Життя внесе правки, і це нормально."}],function(){e5day(1)});
+return;
+}
+actionsHTML(task("Розклади тиждень: "+D5[d]+".")+
+btn(E5P.ab.n,"Лендинг і банери, без пауз.","","pa")+
+btn(E5P.ar.n,"Блок для Марти, потім повітря.","","pb")+
+btn(E5P.br.n,"Блок для клієнта, потім повітря.","","pc")+
+btn(E5P.rr.n,"Тіло теж у команді.","","pd"));
+var m={pa:"ab",pb:"ar",pc:"br",pd:"rr"};
+["pa","pb","pc","pd"].forEach(function(id){
+$(id).onclick=function(){S.plan[d]=m[id];e5plan(d+1)};
+});
+}
+function e5day(d){
+S.day=d;setTime("m");setRoomMode("work");
+setDay(D5[d]);e5bal();
+if(S.sickPending){e5sick(d);return}
+if(S.debt>=3&&d<4){S.energy=clamp(S.energy-10);refresh();
+say([{w:"n",t:"Ранок починається з боргу: тіло вмикається через силу."}],function(){e5event(d)});
+}else{e5event(d)}
+}
+function e5event(d){
+if(d===1){
+say([{w:"n",t:"Понеділок ще не встиг початись, а Марта вже пише: «і мобільну версію глянь до пʼятниці, добре?»"}],function(){
+setSignal(S.signal+8);
+actionsHTML(task("Твоя відповідь Марті.")+
+btn("Включу в план","","","q1")+
+btn("Мобільна після пʼятниці, чесно","","","q2"));
+$("q1").onclick=function(){S.route.push("agree");
+say([{w:"n",t:"«Супер!» Пункт тихо лягає у купу до інших."}],function(){e5menu(d)})};
+$("q2").onclick=function(){S.route.push("bound");setSignal(S.signal-6);
+say([{w:"n",t:"Марта: «ок, логічно, дякую що чесно»."},
+{w:"s",t:"Чуєш? Межа, сказана спокійно, нікого не образила."}],function(){e5menu(d)})};
+});
+}
+if(d===2){
+say([{w:"n",t:"Знайома в чаті: «зроби два банерчики, там годинка роботи, ну будь ласочка»."}],function(){
+actionsHTML(task("Третій проєкт на тиждень двох строків.")+
+btn("Взяти, годинка ж","","","t1")+
+btn("Відмовити чемно","Цього тижня два строки. Наступного допоможу.","","t2"));
+applyPull("t1");
+$("t1").onclick=function(){S.third=true;S.route.push("third");
+say([{w:"n",t:"«Дякуююю!» Годинка тихо розкладається по всіх днях тижня."}],function(){e5menu(d)})};
+$("t2").onclick=function(){S.route.push("no3");setSignal(S.signal+4);
+say([{w:"n",t:"Три крапки. Потім: «ок, зрозуміло». Незручно рівно хвилину."},
+{w:"s",t:"Незручність від «ні» коротша за тиждень із трьома проєктами."}],function(){e5menu(d)})};
+});
+}
+if(d===3){
+if(S.debt>=2){S.route.push("debtsign");S.energy=clamp(S.energy-10);setSignal(S.signal+12);refresh();
+say([{w:"n",t:"Середа зустрічає дзвоном у скронях: очі відкриваються, а тіло ще ні."},
+{w:"s",t:"Це рахунок за ривки. Тіло не сперечається, воно просто нараховує."}],function(){e5menu(d)});
+}else{
+say([{w:"n",t:"Під раковиною виявляється калюжка: злив здався саме цього тижня."}],function(){
+actionsHTML(task("Кран крапає.")+
+btn("Викликати майстра сьогодні","","","k1")+
+btn("Хай почекає до вихідних","","","k2"));
+$("k1").onclick=function(){S.leak="fix";S.route.push("fixleak");S.energy=clamp(S.energy-6);refresh();
+say([{w:"n",t:"Майстер приходить о третій, пів години і тиша під раковиною."}],function(){e5menu(d)})};
+$("k2").onclick=function(){S.leak="wait";S.quiet+=2;S.route.push("leak");
+say([{w:"n",t:"Калюжка отримує миску. Миска отримує надію."}],function(){e5menu(d)})};
+});
+}
+}
+if(d===4){e5peak();return}
+}
+function e5menu(d){
+var p=E5P[S.plan[d]];
+var h=task(D5[d]+". План: "+p.n.toLowerCase()+".")+
+btn("Триматись плану","","gold","m1")+
+btn("Перекроїти сьогодні","","","m2");
+if(!S.letterUsed&&d>=3)h+=btn("Написати про перенесення","Один чесний лист, поки не четвер.","","m3");
+actionsHTML(h);
+$("m1").onclick=function(){e5exec(d,S.plan[d])};
+$("m2").onclick=function(){e5recut(d)};
+if(!S.letterUsed&&d>=3)$("m3").onclick=function(){e5letter(false,d)};
+}
+function e5recut(d){
+actionsHTML(task("Новий план на сьогодні.")+
+btn(E5P.ab.n,"","","ra")+btn(E5P.ar.n,"","","rb")+btn(E5P.br.n,"","","rc")+btn(E5P.rr.n,"","","rd"));
+var m={ra:"ab",rb:"ar",rc:"br",rd:"rr"};
+["ra","rb","rc","rd"].forEach(function(id){
+$(id).onclick=function(){S.route.push("recut");e5exec(d,m[id])};
+});
+}
+function e5exec(d,k){
+var p=E5P[k];
+var bonus=S.fresh?10:0;S.fresh=(k==="rr");
+var da=p.a?p.a+bonus:0,db=p.b?p.b+bonus:0;
+S.pA=clamp(S.pA+da);S.pB=clamp(S.pB+db);
+S.energy=clamp(S.energy-p.en);S.debt+=p.debt;
+if(k==="ab")S.route.push("dAB");if(k==="ar")S.route.push("dAR");if(k==="br")S.route.push("dBR");if(k==="rr")S.route.push("dRR");
+if(S.third){S.energy=clamp(S.energy-8);S.pA=clamp(S.pA-2);S.pB=clamp(S.pB-2)}
+e5bal();
+var lines=[];
+if(k==="ab")lines.push({w:"n",t:"Лендинг і банери по черзі, без пауз. Обидва ростуть, скроні дзвенять."});
+if(k==="ar")lines.push({w:"n",t:"Мобільна версія лендингу підтягується до десктопу. Потім пів години неба з підвіконня."});
+if(k==="br")lines.push({w:"n",t:"Банери шикуються сіткою: шість форматів, один характер. Потім чай без екрана."});
+if(k==="rr")lines.push({w:"n",t:"День без макетів. Прогулянка, довгий душ, їжа не над клавіатурою."},{w:"s",t:"Це не втрачений день. Це паливо для завтра, побачиш."});
+if(S.third)lines.push({w:"n",t:"Плюс «годинка» банерчиків для знайомої, яка зʼїдає більше, ніж обіцяла."});
+if(bonus&&k!=="rr")lines.push({w:"s",t:"Відчуваєш? Після вчорашнього видиху руки швидші."});
+say(lines,function(){e5post(d)});
+}
+function e5post(d){
+if(S.energy<CFG.sickAt&&d<4){S.sickPending=true;
+say([{w:"n",t:"Надвечір літери на екрані розпливаються, чашка здається важкою."},
+{w:"s",t:"Тіло виставляє рахунок. Завтра доведеться платити."}],function(){evening(function(){e5day(d+1)})});
+}else{evening(function(){e5day(d+1)})}
+}
+function e5letter(forced,d){
+var who=null,fact=null,date=null;
+actionsHTML(task(forced?"Лист до девʼятої. Три частини, без самобичування.":"Чесний лист про перенесення. Три частини.")+
+'<p class="grouplab px">КОМУ</p>'+
+'<button class="chip" id="lw1">Марті, про лендинг</button>'+
+'<button class="chip" id="lw2">Клієнту, про банери</button>'+
+'<p class="grouplab px">ФАКТ, БЕЗ ВИБАЧЕНЬ НА ПІВСТОРІНКИ</p>'+
+'<button class="chip" id="lf1">Два строки зійшлись в один день</button>'+
+'<button class="chip" id="lf2">Обсяг видно заздалегідь, і він більший за добу</button>'+
+'<p class="grouplab px">НОВА ДАТА</p>'+
+'<button class="chip" id="ld1">Понеділок до обіду</button>'+
+'<button class="chip" id="ld2">Субота, перша половина</button>'+
+'<div id="preview">…</div>'+
+btn(forced?"Надіслати до девʼятої":"Надіслати","","gold","lgo"));
+function paint(){
+["lw1","lw2"].forEach(function(i){$(i).classList.toggle("sel",who===i)});
+["lf1","lf2"].forEach(function(i){$(i).classList.toggle("sel",fact===i)});
+["ld1","ld2"].forEach(function(i){$(i).classList.toggle("sel",date===i)});
+$("preview").innerHTML=(who?(who==="lw1"?"Марто, ":"Добрий день! ") : "…")+(fact?($(fact).textContent.toLowerCase()+". "):"…")+(date?("Пропоную: "+$(date).textContent.toLowerCase()+"."):"");
+}
+paint();
+["lw1","lw2"].forEach(function(i){$(i).onclick=function(){who=i;paint()}});
+["lf1","lf2"].forEach(function(i){$(i).onclick=function(){fact=i;paint()}});
+["ld1","ld2"].forEach(function(i){$(i).onclick=function(){date=i;paint()}});
+$("lgo").onclick=function(){
+if(!who||!fact||!date){$("preview").innerHTML="Три частини: кому, факт, дата. І лист складеться.";return}
+S.letterUsed=true;S.letterProj=(who==="lw1"?"A":"B");S.route.push("letter");
+if(forced){
+say([
+{w:"n",t:"Надіслано о 8:12. Відповідь до девʼятої: «дякую, що заздалегідь. нова дата ок.»"},
+{w:"s",t:"Дорослість це не тягнути все. Це вчасно сказати, що саме потягнеш."},
+{w:"n",t:"Четвер проходить по одному проєкту. Рівно, без пожежі."}
+],function(){mirror5("F")});
+}else{
+setSignal(S.signal-10);e5bal();
+say([
+{w:"n",t:"Відповідь за пів години: «дякую, що сказали заздалегідь, так навіть зручніше»."},
+{w:"s",t:"Бачиш? Світ не завалився. Він передомовився."}
+],function(){e5menu2(d)});
+}
+};
+}
+function e5menu2(d){
+var p=E5P[S.plan[d]];
+actionsHTML(task(D5[d]+". План: "+p.n.toLowerCase()+".")+
+btn("Триматись плану","","gold","m1")+
+btn("Перекроїти сьогодні","","","m2"));
+$("m1").onclick=function(){e5exec(d,S.plan[d])};
+$("m2").onclick=function(){e5recut(d)};
+}
+function e5peak(){
+setDay("ЧЕТВЕР · ПІК");e5bal();
+if(S.sickPending){
+say([{w:"n",t:"Четвер. Тіло не встає: рахунок за тиждень прийшов у день обох здач."},
+{w:"s",t:"Мені шкода. Борг зібрався весь і одразу."}],function(){
+showFail("Обидва дедлайни горять одночасно, а сил нема навіть сісти за стіл.",e5wake)});
+return;
+}
+var canRush=S.energy>=30&&!S.letterUsed;
+var h=task("Четвер. "+(S.letterUsed?"Одна здача сьогодні, друга перенесена.":"Обидві здачі сьогодні."))+
+(canRush?btn("Ривок по обох","Все, що лишилось, в один день.","","z1"):"")+
+btn(S.letterUsed&&S.letterProj==="A"?"Фокус: банери":"Фокус: лендинг","","","z2")+
+btn(S.letterUsed&&S.letterProj==="B"?"Фокус: лендинг":"Фокус: банери","","","z3")+
+btn("Здати як є","","","z4");
+actionsHTML(h);
+var bonus=S.fresh?10:0;S.fresh=false;
+function fin(){e5bal();e5resolve()}
+if(canRush)$("z1").onclick=function(){S.route.push("peakBoth");S.pA=clamp(S.pA+16+bonus);S.pB=clamp(S.pB+16+bonus);S.energy=clamp(S.energy-36);S.debt++;fin()};
+$("z2").onclick=function(){S.route.push("peakA");var t=(S.letterUsed&&S.letterProj==="A")?"B":"A";if(t==="A"){S.pA=clamp(S.pA+26+bonus)}else{S.pB=clamp(S.pB+26+bonus)}S.energy=clamp(S.energy-22);fin()};
+$("z3").onclick=function(){S.route.push("peakB");var t=(S.letterUsed&&S.letterProj==="B")?"A":"B";if(t==="B"){S.pB=clamp(S.pB+26+bonus)}else{S.pA=clamp(S.pA+26+bonus)}S.energy=clamp(S.energy-22);fin()};
+$("z4").onclick=function(){S.route.push("peakAsIs");S.energy=clamp(S.energy-4);fin()};
+}
+function e5resolve(){
+var needA=!S.letterUsed||S.letterProj!=="A";
+var needB=!S.letterUsed||S.letterProj!=="B";
+var okA=!needA||S.pA>=45;
+var okB=!needB||S.pB>=45;
+S.sentA=okA;S.sentB=okB;
+if(!okA&&!okB){
+showFail("Шістнадцята. Обидва файли не готові, обидва чати світяться питаннями.",e5wake);
+return;
+}
+var lines=[];
+if(S.letterUsed)lines.push({w:"n",t:"Перенесений проєкт спокійно чекає своєї дати: лист зробив своє."});
+if(needA)lines.push({w:"n",t:okA?"Лендинг летить до Марти. «Дякую! Мобільна версія топ.»":"Лендинг іде з дірками. Марта: «...поговоримо завтра.»"});
+if(needB)lines.push({w:"n",t:okB?"Банер-пак пішов клієнту: шість форматів, один характер. «Беремо!»":"Банери йдуть сирими. Клієнт відповідає сухо."});
+if(!(okA&&okB)){setSignal(S.signal+14);S.quiet+=2}
+say(lines,function(){evening(function(){e5fri()})});
+}
+function e5fri(){
+S.day=5;setDay(D5[5]);setTime("m");e5bal();
+var seq=[];
+if(S.leak==="wait"){S.energy=clamp(S.energy-14);S.route.push("burst");
+seq.push({w:"n",t:"Пʼятниця починається з миски, що здалась: під раковиною тепер море. Майстер, ганчірки, дві години."})}
+if(S.third)seq.push({w:"n",t:"Знайома дякує стікером із сердечком. Приємно. І тепер видно справжню ціну «годинки»."});
+if(S.debt>=3)seq.push({w:"n",t:"Тиждень виграно спринтом, але акумулятор показує нуль ще до обіду."});
+if(!seq.length)seq.push({w:"n",t:"Пʼятниця тиха. Хвости підбираються самі, чай встигає охолонути недопитим, і це розкіш."});
+say(seq,function(){
+actionsHTML(task("Тиждень закінчується.")+
+btn("Подякувати собі вголос","","","f1")+
+btn("Одразу планувати наступний","","","f2"));
+$("f1").onclick=function(){S.route.push("thanks");setSignal(S.signal-8);refresh();
+say([{w:"s",t:"«Я провів цей тиждень» звучить краще за «я вижив». Скажи як тобі точніше."}],e5deadline)};
+$("f2").onclick=function(){
+say([{w:"s",t:"Окей, плановик. Але спершу глянемо, як пройшов цей."}],e5deadline)};
+});
+}
+function e5deadline(){
+setCd("");
+var bal=S.prog;
+if(bal>=70&&S.debt<=2&&!S.letterUsed&&S.sentA&&S.sentB){
+setDay("ТИЖДЕНЬ ТВІЙ");
+say([{w:"n",t:"Обидва проєкти здані, тіло живе, вечір пʼятниці пахне вечором пʼятниці."},
+{w:"s",t:"Два строки, нуль пожеж. Тиждень пройшов на твоїх умовах."}],function(){mirror5("A1")});
+}else if(bal>=45||S.letterUsed||(S.sentA!==S.sentB)){
+setDay("З ЛАТКАМИ");
+say([{w:"n",t:"Тиждень дійшов до пʼятниці не ідеальним, але дійшов."},
+{w:"s",t:S.debt>=3?"Спринт виграно, тіло програло. Наступного разу відпочинок піде в план першим.":"Латки це не поразка. Це чесні шви живого тижня."}],function(){mirror5("A2")});
+}else{
+showFail("Пʼятниця. Обидва чати мовчать так, як мовчать перед грозою.",e5wake);
+}
+}
+function e5sick(d){
+S.sickPending=false;S.route.push("sick");
+setRoomMode("bed");setDay(D5[d]+" · ЛІКАРНЯНИЙ");
+S.energy=clamp(S.energy+CFG.sickHeal);setSignal(S.signal-CFG.sickCalm);
+say([
+{w:"n",t:"Ранок не вмикається. Стеля, чай, і жодного пікселя."},
+{w:"s",t:"Відпочинок, який ти обираєш, це стратегія. Відпочинок, який тебе змушує, це рахунок. Сьогодні платимо."}
+],function(){
+setRoomMode("work");
+if(d>=4){showFail("День здач минув у ліжку. Обидва чати світяться непрочитаним.",e5wake)}
+else{evening(function(){e5day(d+1)})}
+});
+}
+function e5wake(){
+S.route.push("dream");
+setRoomMode("bed");setTime("m");setDay("СЕРЕДА · 7:40");setCd("");
+say([
+{w:"n",t:"Різкий вдих. Стеля. Годинник показує 7:40, і це середа."},
+{w:"s",t:"Сон. Мій: я показав четвер, у якому горіло все одразу. До девʼятої ще година, і все можна інакше."},
+{w:"n",t:"Ноутбук відкривається ще до кави."}
+],function(){e5letter(true,3)});
+}
+function mirror5(tier){
+setDay("ЕПІЗОД 5 · ЗАВЕРШЕНО");setCd("");G.eps[4]=true;applyRoom();
+var names={agree:"мовчазне «включу»",bound:"спокійна межа",third:"третій проєкт",no3:"чемна відмова",fixleak:"майстер сьогодні",leak:"миска надії",burst:"прорив у пʼятницю",debtsign:"рахунок тіла",recut:"перекроєний день",dAB:"день без пауз",dAR:"лендинг і видих",dBR:"банери і видих",dRR:"день відновлення",letter:"чесний лист",peakBoth:"ривок по обох",peakA:"фокус на лендингу",peakB:"фокус на банерах",peakAsIs:"здано як є",sick:"лікарняний",thanks:"подяка собі",dream:"сон-попередження"};
+var path=S.route.map(function(r){return names[r]||r}).join(" → ");
+var ends={A1:{t:"ТИЖДЕНЬ НА СВОЇХ УМОВАХ",d:"Два строки, нуль пожеж, живе тіло. Ритм виявився сильнішим за героїзм."},
+A2:{t:"ПРОЙДЕНО З ЛАТКАМИ",d:"Не ідеально, зате чесно і до кінця. Латки це шви живого тижня."},
+F:{t:"ЛИСТ ДО ДЕВʼЯТОЇ",d:"Сон показав четвер, де горіло все. Ранок показав, що один чесний лист гасить половину пожежі заздалегідь."}};
+var quietTxt=S.quiet>0
+?"Тиха ціна: "+S.quiet+". Це відкладені миски і недоздані файли. Без осуду: тепер ти їх бачиш."
+:"Тиха ціна: 0. Нічого не чекало в тіні.";
+var debtTxt=S.debt>0?'<div class="mcard">Борг ривків: '+S.debt+'. Тіло рахує мовчки і виставляє рахунки пізніше. Але завжди.</div>':'';
+$("game").classList.add("hidden");
+var m=$("mirror");
+m.style.display="flex";
+m.innerHTML=
+'<h2 class="px">ДЗЕРКАЛО ЕПІЗОДУ</h2>'+
+'<div class="mcard end"><div class="cap px">КІНЦІВКА</div><div class="big px">'+ends[tier].t+'</div><div style="margin-top:8px">'+ends[tier].d+'</div></div>'+
+'<div class="mcard"><div class="cap px">ТВІЙ МАРШРУТ</div>'+esc(path)+'.<br>Сигнал звучав, і на нього була відповідь. Без правильних ходів, лише різні ціни.</div>'+
+'<div class="statrow">'+
+'<div class="st"><div class="v">'+Math.round(S.prog)+'</div><div class="k px">БАЛАНС</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.signal)+'</div><div class="k px">СИГНАЛ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.rhythm)+'</div><div class="k px">РИТМ</div></div>'+
+'<div class="st"><div class="v">'+S.quiet+'</div><div class="k px">ТИХА ЦІНА</div></div>'+
+'</div>'+
+'<div class="mcard">'+quietTxt+'</div>'+debtTxt+
+'<button class="abtn" id="sciBtn5">Як це працює. Для допитливих</button>'+
+'<div class="mcard hidden" id="sciCard5"><div class="cap px">НАУКОВА КАРТКА · 5 з 7</div>'+
+'У дослідженні 314 українців 18-29 найцікавіше не те, що чутливі люди більше виснажуються. А те, що саме їх захищає: не сила волі і не «менше переживай», а нудний щоденний ритм. У людей з міцними буденними опорами (сон, план, дрібний порядок) тривога перетворюється на виснаження приблизно вдвічі слабше. Звідси чесне перевизначення «здорового невротизму»: це не менше відчувати. Це інакше відповідати: планувати відпочинок як роботу, помічати борг ривків і вчасно казати, що саме потягнеш.</div>'+
+'<div class="mcard"><div class="cap px">СИГНАЛ</div>Тиждень тримається не на героїзмі, а на ритмі. До наступних дверей.</div>'+
+'<div class="mcard safe">Якщо напруга чи пригніченість не слабшають понад два тижні, ламаються сон або щоденні справи, чи зʼявляються думки про самоушкодження: це привід звернутись до фахівця. Телефон довіри 7333, цілодобово. Екстрена допомога 112.</div>'+
+'<div class="codecard"><div class="cap px" style="color:var(--mist)">КОД ЗБЕРЕЖЕННЯ</div><div class="cd px" id="saveCode5"></div><div style="font-size:12px;color:#CDB578;margin-top:6px">Запиши або сфотографуй: він поверне кімнату і зірки наступного разу.</div></div>'+
+'<button class="abtn gold" id="mapBtn5">На мапу сезону</button>'+
+'<button class="abtn" id="againBtn5">Пройти епізод ще раз, іншим маршрутом</button>';
+$("sciBtn5").onclick=function(){$("sciCard5").classList.toggle("hidden")};
+$("saveCode5").textContent=packCode();
+$("mapBtn5").onclick=goMap;
+$("againBtn5").onclick=startEp5;
+}
+
+function e6g(){setCd("ГОТОВНІСТЬ: "+Math.round(S.prog)+"%");refresh()}
+function startEp6(){resetEp();S.ep=6;$("epLab").textContent="ГОТОВНІСТЬ";syncNameUI();
+S.voice=100;S.fmt=null;S.declined=false;S.accepted=false;S.doneSk=false;S.doneSt=false;S.doneRn=false;S.night=null;
+$("map").style.display="none";$("mirror").style.display="none";
+$("hud").classList.remove("hidden");$("meta").classList.remove("hidden");$("game").classList.remove("hidden");
+setRoomMode("work");applyRoom();refresh();e6b0()}
+function e6b0(){
+setDay("ЛИСТ");setTime("d");e6g();
+say([
+{w:"n",t:"Пошта: «Привіт! Я Оля, кураторка дизайн-мітапу. Бачила ваш лендинг для Maple Crumb: дуже тепло зроблено. Розкажете за пʼятнадцять хвилин про процес? Виступ у четвер.»"},
+{w:"n",t:"Палець сам тягнеться до ввічливої відмови, поки не передумали кликати."}
+],function(){
+revealFlame();setSignal(76);
+say([{w:"s",t:"Це я, і сьогодні я гучний як ніколи в сезоні. Знаєш чому? Бо це важливо. Страх і важливість ходять парою."}],e6first);
+});
+}
+function e6first(){
+actionsHTML(task("Перші десять хвилин після листа.")+
+btn("Ввічливо відмовитись одразу","Дякую, але цього разу ні.","","f1")+
+btn("Взяти паузу до вечора","Дякую! Гляну графік і відповім.","","f2")+
+btn("Погодитись одним рядком","Так! Кидайте деталі.","","f3"));
+applyPull("f1");
+$("f1").onclick=function(){S.declined=true;S.route.push("declined");
+say([{w:"n",t:"Оля: «Розумію! Якщо передумаєте, слот ваш до вечора середи.»"},
+{w:"s",t:"Двері не зачинились. Вони прочинені до середи. А страх не питає, відмовились ми чи ні: розкладемо його, поки теплий."}],e6reframe)};
+$("f2").onclick=function(){S.accepted=true;S.route.push("pause");setSignal(S.signal-8);
+say([{w:"s",t:"Пауза це вже відповідь страху: «я тебе чую, і я подумаю». Увечері скажемо «так» по-своєму."},
+{w:"n",t:"Увечері летить коротке: «Так, цікаво! Формат обговоримо?» Оля: «Ура! Подзвоню в середу.»"}],e6reframe)};
+$("f3").onclick=function(){S.accepted=true;S.route.push("yesfast");
+say([{w:"n",t:"Оля миттєво: «Ураа! Кидаю деталі.»"},
+{w:"s",t:"Сміливо. Тепер наздоженемо голову: розкладемо страх на частини."}],e6reframe)};
+}
+var E6R=[["«Мене засміють.»","Мене покликали за реальну роботу"],
+["«Я не спікер.»","Пʼятнадцять хвилин про свій процес це розповідь, не іспит"],
+["«Всі побачать, що я випадковість.»","Лендинг існує, і кавʼярня ним користується. Це не випадковість"]];
+function e6reframe(i){
+i=i||0;
+if(i>=3){
+say([{w:"s",t:"«Страшно» і «важливо» пишуться різними словами, а відчуваються однаково. Тепер зберемо виступ шматками."}],e6formula);
+return;
+}
+var r=E6R[i];
+say([{w:"t",t:r[0]}],function(){
+actionsHTML(task("Картка страху "+(i+1)+" з 3. Переклади або лиши.")+
+btn(r[1],"","","rc1")+
+btn("Так і є, чого прикидатись","","","rc2"));
+$("rc1").onclick=function(){S.route.push("refr");S.prog=clamp(S.prog+4);setSignal(S.signal-6);e6g();
+say([{w:"n",t:"Фраза, перекладена фактом, важить менше і стоїть рівніше."}],function(){e6reframe(i+1)})};
+$("rc2").onclick=function(){S.route.push("stay");setSignal(S.signal+4);
+say([{w:"n",t:"Фраза лишається висіти, як мокре пальто."}],function(){e6reframe(i+1)})};
+});
+}
+function e6formula(){
+actionsHTML(task("Формула епізоду.")+
+'<div id="preview">Якщо страшно почати, то <b>перший слайд уголос</b>.</div>'+
+btn("Закріпити","","gold","fgo"));
+$("fgo").onclick=function(){S.route.push("form");
+say([{w:"s",t:"Записано. Не «підготуватись до виступу», а один слайд, один голос, один раз. Решта чіпляється сама."}],function(){e6day(1)})};
+}
+function e6day(d){
+S.day=d;setTime("m");setRoomMode("work");setDay(D5[d]);e6g();
+if(S.sickPending){e6sick(d);return}
+if(d===1){say([{w:"n",t:"Оля надсилає деталі: сцена маленька, людей до сорока, все по-домашньому."}],function(){e6work(d)})}
+if(d===2){
+say([{w:"n",t:"Стрічка підкидає відео чужого виступу: ідеальні слайди, ідеальні жарти, ідеальна поза."}],function(){
+actionsHTML(task("Чуже ідеальне відео.")+
+btn("Додивитись і порівнювати","","","v1")+
+btn("Закрити: у мене свій процес","","","v2"));
+$("v1").onclick=function(){S.route.push("compare");setSignal(S.signal+10);refresh();
+say([{w:"n",t:"Пів години порівнянь. Свій виступ здається меншим, ніж був зранку."},
+{w:"s",t:"Порівняння це податок, який платиш чужому успіху зі свого спокою."}],function(){e6work(d)})};
+$("v2").onclick=function(){S.route.push("own");setSignal(S.signal-4);S.prog=clamp(S.prog+2);e6g();
+say([{w:"n",t:"Хрестик. Тиша. Свій процес на своєму екрані."}],function(){e6work(d)})};
+});
+}
+if(d===3){
+if(S.declined&&!S.accepted){
+say([{w:"n",t:"Середа. Оля: «нагадую про слот, він ще ваш до вечора»."}],function(){
+actionsHTML(task("Друге рішення.")+
+btn("Так, беру слот","","","d1")+
+btn("Остаточно ні","","","d2"));
+$("d1").onclick=function(){S.accepted=true;S.route.push("yes2");setSignal(S.signal-6);
+say([{w:"n",t:"«Так, беру.» Оля: «Юхуу! Тоді про формат...»"}],e6format)};
+$("d2").onclick=function(){S.route.push("no2");
+if(S.prog>=30){say([{w:"n",t:"«Цього разу остаточно ні. Наступного мітапу так.» Оля: «Домовились, тримаю за вами.»"}],function(){mirror6("D")})}
+else{say([{w:"n",t:"«Ні.» Коротко. Двері зачиняються тихо, але щось у грудях гупає голосно."}],function(){e6nightSkipToDream()})}
+};
+});
+}else{
+say([{w:"n",t:"Середа. Дзвінок від Олі: «то який формат вам зручний?»"}],e6format);
+}
+}
+}
+function e6format(){
+actionsHTML(task("Оля питає формат.")+
+btn("Повний виступ зі слайдами","Пʼятнадцять хвилин, як задумано.","","o1")+
+btn("Коротка розповідь без слайдів","Десять хвилин, живі очі.","","o2")+
+btn("Розмова-інтерв'ю з Олею","Питання і відповіді, без сцени соло.","","o3"));
+$("o1").onclick=function(){S.fmt="full";S.route.push("fmtF");
+say([{w:"n",t:"«Повний, зі слайдами.» Оля: «Клас!»"}],function(){e6work(3)})};
+$("o2").onclick=function(){S.fmt="short";S.route.push("fmtS");S.prog=clamp(S.prog+4);setSignal(S.signal-6);e6g();
+say([{w:"n",t:"«Коротка розповідь, без слайдів.» Оля: «Обожнюю такий формат.»"},
+{w:"s",t:"Свій формат це не втеча. Це крій по фігурі."}],function(){e6work(3)})};
+$("o3").onclick=function(){S.fmt="talk";S.route.push("fmtT");S.prog=clamp(S.prog+4);setSignal(S.signal-8);e6g();
+say([{w:"n",t:"«Розмова з вами.» Оля: «Ідеально, я вмію питати.»"}],function(){e6work(3)})};
+}
+function e6work(d){
+actionsHTML(task("Шматок на сьогодні.")+
+btn("Скелет слайдів","Сім кадрів, по одній думці.","","w1")+
+btn("Історія процесу","Від брифу до «Wow» Марти.","","w2")+
+btn("Прогін уголос","Перший слайд і далі, скільки піде.","","w3")+
+btn("Не сьогодні","Стрічка, чай.","","w4"));
+applyPull("w4");
+$("w1").onclick=function(){var v=S.doneSk?8:16;S.doneSk=true;S.route.push("wSk");S.prog=clamp(S.prog+v);S.energy=clamp(S.energy-14);e6g();
+say([{w:"n",t:S.doneSk&&v===8?"Слайди полірується: менше слів, більше повітря.":"Сім кадрів стають скелетом: по одній думці на слайд."}],function(){e6post(d)})};
+$("w2").onclick=function(){var v=S.doneSt?8:16;S.doneSt=true;S.route.push("wSt");S.prog=clamp(S.prog+v);S.energy=clamp(S.energy-14);e6g();
+say([{w:"n",t:"Історія складається: бриф, мудборд, сітка, «Wow» від Марти. Виявляється, є що розповісти."}],function(){e6post(d)})};
+$("w3").onclick=function(){var first=!S.doneRn;S.doneRn=true;S.route.push("wRn");
+var v=(S.doneSk||S.doneSt)?18:8;S.prog=clamp(S.prog+v);S.energy=clamp(S.energy-10);setSignal(S.signal-8);e6g();
+say([{w:"n",t:v===8?"Прогін по повітрю: без скелета слова розлітаються, але голос звучить.":"Перший слайд уголос. Потім другий сам. Голос у кімнаті звучить упевненіше, ніж у голові."}].concat(first?[{w:"s",t:"Формула спрацювала: почалось із одного слайда."}]:[]),function(){e6post(d)})};
+$("w4").onclick=function(){S.route.push("skip");S.quiet+=2;S.energy=clamp(S.energy+8);setSignal(S.signal-16);e6g();
+say([{w:"n",t:"Не сьогодні. Виступ лежить у теці і росте в уяві."},
+{w:"s",t:"Легше одразу, я знаю. А четвер ближче, ти теж знаєш."}],function(){e6post(d)})};
+}
+function e6post(d){
+if(S.energy<CFG.sickAt&&d<3){S.sickPending=true;
+say([{w:"n",t:"Надвечір тіло вимикає звук: очі злипаються над сьомим кадром."}],function(){evening(function(){e6day(d+1)})});
+return;
+}
+if(d<3){evening(function(){e6day(d+1)})}
+else{evening(e6night)}
+}
+function e6night(){
+setDay("НІЧ ПЕРЕД ВИСТУПОМ");setTime("e");
+say([{w:"n",t:"Слайди лежать. Історія лежить. І раптом усе здається не тим."}],function(){
+actionsHTML(task("Ніч напередодні.")+
+btn("Лягти спати: як є, так є","","","n1")+
+btn("Переписати доповідь з нуля","","","n2")+
+btn("Репетирувати до третьої","","","n3"));
+$("n1").onclick=function(){S.night="sleep";S.route.push("sleepN");S.energy=clamp(S.energy+16);S.rhythm=clamp(S.rhythm+6);refresh();
+say([{w:"n",t:"Світло гасне. «Як є» уві сні тихо дозріває у «достатньо»."}],e6morning)};
+$("n2").onclick=function(){S.night="rewrite";S.route.push("rewrite");S.voice-=35;S.energy=clamp(S.energy-20);S.prog=clamp(S.prog-6);e6g();
+say([{w:"n",t:"До третьої ночі народжується версія 2.0, підозріло схожа на 1.0. Тільки без сну."},
+{w:"s",t:"Ідеал уночі виглядає як порятунок, а вранці як мішки під очима."}],e6morning)};
+$("n3").onclick=function(){S.night="late";S.route.push("night3");S.voice-=25;S.energy=clamp(S.energy-18);S.prog=clamp(S.prog+4);e6g();
+say([{w:"n",t:"Третя ночі. Стіни знають доповідь напамʼять. Голос уже ні."},
+{w:"s",t:"Після півночі репетиція тренує лише втому."}],e6morning)};
+});
+}
+function e6nightSkipToDream(){
+showFail("Ніч після «ні» довга. Уві сні двері мітапу все одно відчиняються самі.",e6wake);
+}
+function e6morning(){
+if(S.prog<45){
+showFail("Сцена. Мікрофон мовчить, хоч кричи. Зал підводиться і розходиться, не дивлячись.",e6wake);
+return;
+}
+e6show();
+}
+function e6show(){
+setDay("ЧЕТВЕР · МІТАП");setCd("");setTime("d");
+var fl={full:"Зал на сорок людей, проєктор гуде, перший слайд уже світиться.",short:"Маленька сцена без проєктора: тільки ти, мікрофон і живі очі.",talk:"Два крісла і Оля з списком теплих питань."}[S.fmt||"short"];
+say([
+{w:"n",t:"Дорога до простору мітапу. Долоні прохолодні, серце репетирує барабани."},
+{w:"s",t:"Дихай зі мною: чотири вдих, шість видих. Я не ворог, я твій барабанщик."}
+],function(){
+actionsHTML(task("Перед дверима.")+
+btn("Три повільні дихання","","","b1")+
+btn("Зайти одразу","","","b2"));
+$("b1").onclick=function(){S.route.push("breath");setSignal(S.signal-10);refresh();
+say([{w:"n",t:fl}],e6m1)};
+$("b2").onclick=function(){say([{w:"n",t:fl}],e6m1)};
+});
+}
+function e6m1(){
+say([{w:"s",t:"Момент настав. Формула, памʼятаєш?"}],function(){
+actionsHTML(task("Початок.")+
+btn("Перше речення вголос","","gold","s1")+
+btn("Почати з вибачень","Вибачте, я взагалі не спікер...","","s2"));
+$("s1").onclick=function(){S.route.push("first");S.prog=clamp(S.prog+8);setSignal(S.signal-8);e6g();
+say([{w:"n",t:"Перше речення виходить рівним. Друге чіпляється за нього само."}],e6m2)};
+$("s2").onclick=function(){S.route.push("sorry");setSignal(S.signal+6);
+say([{w:"n",t:"Зал ввічливо киває. Вибачення зʼїдає першу хвилину і нічого не дає навзаєм."}],e6m2)};
+});
+}
+function e6m2(){
+say([{w:"n",t:"Посередині думка тікає: на екрані сітка, а слова зникли."}],function(){
+var lowV=S.voice<70;
+var h=task("Запинка.")+
+btn("Пауза і ковток води","","","q1")+
+btn("Чесно: «думка втекла, секунду»","","","q2");
+if(!lowV)h+=btn("Швидко-швидко заговорити","","","q3");
+else h+='<p class="hintline">Голос сів після ночі: на швидких фразах він ламається, лишаються повільні.</p>';
+actionsHTML(h);
+$("q1").onclick=function(){S.route.push("water");S.prog=clamp(S.prog+10);e6g();
+say([{w:"n",t:"Ковток. Три секунди тиші."},
+{w:"s",t:"Пауза на сцені звучить як упевненість. Смішно, але факт."}],e6m3)};
+$("q2").onclick=function(){S.route.push("honest2");S.prog=clamp(S.prog+12);e6g();
+say([{w:"n",t:"«Думка втекла, секунду.» Зал усміхається: у кожного тікала."}],e6m3)};
+if(!lowV)$("q3").onclick=function(){S.route.push("rush2");S.voice-=10;S.prog=clamp(S.prog+2);e6g();
+say([{w:"n",t:"Слова наздоганяють одне одного і плутаються ногами."}],e6m3)};
+});
+}
+function e6m3(){
+say([{w:"n",t:"Рука з залу: «а чому не зробили темну тему?»"}],function(){
+actionsHTML(task("Питання із залу.")+
+btn("Чесно: темна тема в бек-лозі","Руки поки не дійшли, і це правда.","","p1")+
+btn("Захищатись","Там були обʼєктивні причини...","","p2")+
+btn("Перекинути: «а ви б як?»","","","p3"));
+$("p1").onclick=function(){S.route.push("honest3");S.prog=clamp(S.prog+12);e6g();
+say([{w:"n",t:"«В бек-лозі, руки не дійшли.» Питальник киває: «респект за чесність»."}],e6fin)};
+$("p2").onclick=function(){S.route.push("defend");S.prog=clamp(S.prog+2);setSignal(S.signal+8);
+say([{w:"n",t:"Причини перелічуються довше, ніж тривало б «не встиг»."}],e6fin)};
+$("p3").onclick=function(){S.route.push("bounce");S.prog=clamp(S.prog+8);e6g();
+say([{w:"n",t:"«А ви б як?» Зал оживає: три руки, дві ідеї, один жарт. Виступ стає розмовою."}],e6fin)};
+});
+}
+function e6fin(){
+say([{w:"n",t:"Оплески. Не грім, але справжні: долонями, не з ввічливості."},
+{w:"n",t:"У кулуарах хтось питає візитку. Макс у чаті: «ННУУ? як?» Оля вішає постер мітапу «на памʼять»."}],e6deadline);
+}
+function e6deadline(){
+if(S.prog>=84&&S.voice>=70){
+setDay("ПОЛІТ");
+say([{w:"s",t:"Чуєш себе? Голос рівний, долоні теплі. Страх нікуди не дівся: він просто йшов поруч, а вів ти."}],function(){mirror6("A1")});
+}else{
+setDay("ПРОБА");
+say([{w:"s",t:"Було з запинками і по-живому. Це і є проба: справжня, чесна, твоя."}],function(){mirror6("A2")});
+}
+}
+function e6sick(d){
+S.sickPending=false;S.route.push("sick");
+setRoomMode("bed");setDay(D5[d]+" · ЛІКАРНЯНИЙ");
+S.energy=clamp(S.energy+CFG.sickHeal);setSignal(S.signal-CFG.sickCalm);
+say([{w:"n",t:"Ранок не вмикається: тіло голосує ковдрою."},
+{w:"s",t:"День на паузі. Виступ нікуди не втече, а голос подякує."}],function(){
+setRoomMode("work");
+if(d>=3){S.fmt=S.fmt||"short";evening(e6night)}else{evening(function(){e6day(d+1)})}
+});
+}
+function e6wake(){
+S.route.push("dream");
+setRoomMode("bed");setTime("m");setDay("СЕРЕДА · РАНОК");setCd("");
+say([
+{w:"n",t:"Різкий вдих. Піжама, ковдра, тиша, у якій чутно власний голос: він на місці."},
+{w:"s",t:"Сон. Мій: я вимкнув тобі мікрофон уві сні, вибач. Наяву він і не потрібен: почнемо без сцени."},
+{w:"n",t:"Кава ще крапає, а ноутбук уже відкритий на першому слайді."}
+],function(){
+actionsHTML(task("Формула, версія «піжама».")+
+btn("Перший слайд уголос","","gold","pj1"));
+$("pj1").onclick=function(){S.route.push("pjrun");S.prog=clamp(Math.max(S.prog,50)+12);setSignal(S.signal-12);e6g();
+say([
+{w:"n",t:"Голос звучить. У кімнаті, в піжамі, без свідків: перший прогін стається."},
+{w:"s",t:"Оце і весь секрет: страшне робиться маленьким, коли його роблять."}
+],e6wakeChoice)};
+});
+}
+function e6wakeChoice(){
+actionsHTML(task("Завтра четвер. Двері твої.")+
+btn("Виступ у своєму форматі","","gold","wc1")+
+btn("Чесна відмова з відчиненими дверима","","","wc2"));
+$("wc1").onclick=function(){S.route.push("myfmt");S.fmt="short";
+say([{w:"n",t:"Четвер: коротка розповідь без слайдів, десять хвилин, живі очі. Оплески справжні, долонями."}],function(){mirror6("F")})};
+$("wc2").onclick=function(){S.route.push("opendoor");
+say([{w:"n",t:"Олі летить чесне: «цього разу ні, наступного мітапу так». Відповідь: «домовились, тримаю за вами»."}],function(){mirror6("F")})};
+}
+function mirror6(tier){
+setDay("ЕПІЗОД 6 · ЗАВЕРШЕНО");setCd("");G.eps[5]=true;applyRoom();
+var names={declined:"ввічливе «ні» одразу",pause:"пауза до вечора",yesfast:"так одним рядком",yes2:"так із другої спроби",no2:"остаточне ні",refr:"перекладена картка страху",stay:"мокре пальто",form:"формула першого слайда",compare:"податок порівняння",own:"свій процес",fmtF:"повний формат",fmtS:"свій формат",fmtT:"формат-розмова",wSk:"скелет слайдів",wSt:"історія процесу",wRn:"прогін уголос",skip:"не сьогодні",sleepN:"сон «як є»",rewrite:"переписування з нуля",night3:"репетиція до третьої",breath:"три дихання",first:"перше речення вголос",sorry:"старт із вибачень",water:"пауза і вода",honest2:"чесна запинка",rush2:"швидко-швидко",honest3:"чесний бек-лог",defend:"оборона",bounce:"питання залу назад",sick:"лікарняний",dream:"сон-попередження",pjrun:"прогін у піжамі",myfmt:"виступ у своєму форматі",opendoor:"відчинені двері"};
+var path=S.route.map(function(r){return names[r]||r}).join(" → ");
+var ends={A1:{t:"ВИСТУП-ПОЛІТ",d:"Страх нікуди не дівся. Він ішов поруч, а вів ти: рівним голосом, зі своїм процесом."},
+A2:{t:"ЧЕСНА ПРОБА",d:"З запинками, паузами і живими очима. Проби і є те, з чого ростуть польоти."},
+D:{t:"СВІЙ ТЕМП",d:"Відмова без сорому: матеріал зібраний, двері відчинені на наступний мітап. Це теж доросле «так», лише відкладене."},
+F:{t:"ПРОГІН У ПІЖАМІ",d:"Сон вимкнув мікрофон. Ранок увімкнув голос: перший прогін без свідків, і двері лишились твоїми."}};
+var quietTxt=S.quiet>0
+?"Тиха ціна: "+S.quiet+". Це «не сьогодні», які росли в уяві. Без осуду: тепер ти їх бачиш."
+:"Тиха ціна: 0. Нічого не росло в тіні.";
+var voiceTxt=S.voice<70?'<div class="mcard">Голос: сів до '+S.voice+'. Ночі перед виступом памʼятають усе.</div>':'';
+$("game").classList.add("hidden");
+var m=$("mirror");
+m.style.display="flex";
+m.innerHTML=
+'<h2 class="px">ДЗЕРКАЛО ЕПІЗОДУ</h2>'+
+'<div class="mcard end"><div class="cap px">КІНЦІВКА</div><div class="big px">'+ends[tier].t+'</div><div style="margin-top:8px">'+ends[tier].d+'</div></div>'+
+'<div class="mcard"><div class="cap px">ТВІЙ МАРШРУТ</div>'+esc(path)+'.<br>Сигнал звучав, і на нього була відповідь. Без правильних ходів, лише різні ціни.</div>'+
+'<div class="statrow">'+
+'<div class="st"><div class="v">'+Math.round(S.prog)+'</div><div class="k px">ГОТОВНІСТЬ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.signal)+'</div><div class="k px">СИГНАЛ</div></div>'+
+'<div class="st"><div class="v">'+Math.round(S.rhythm)+'</div><div class="k px">РИТМ</div></div>'+
+'<div class="st"><div class="v">'+S.quiet+'</div><div class="k px">ТИХА ЦІНА</div></div>'+
+'</div>'+
+'<div class="mcard">'+quietTxt+'</div>'+voiceTxt+
+'<button class="abtn" id="sciBtn6">Як це працює. Для допитливих</button>'+
+'<div class="mcard hidden" id="sciCard6"><div class="cap px">НАУКОВА КАРТКА · 6 з 7</div>'+
+'У даних дослідження 314 українців 18-29 «світлий полюс» звичок виглядає буденно: переосмислити («страшно» часто означає «важливо і нове») і прийняти те, що вже факт. Саме ці дві навички стабільно йдуть поруч із нижчою напругою. Це не рожеві окуляри: факти лишаються фактами, міняється підпис під ними. І одне чесне наостанок: сцена любить не безстрашних, а виспаних. Голос тренується до півночі. Після півночі тренується лише втома.</div>'+
+'<div class="mcard"><div class="cap px">СИГНАЛ</div>Страшні двері рідко зачинені. Зазвичай вони просто важкі. До останніх дверей.</div>'+
+'<div class="mcard safe">Якщо напруга чи пригніченість не слабшають понад два тижні, ламаються сон або щоденні справи, чи зʼявляються думки про самоушкодження: це привід звернутись до фахівця. Телефон довіри 7333, цілодобово. Екстрена допомога 112.</div>'+
+'<div class="codecard"><div class="cap px" style="color:var(--mist)">КОД ЗБЕРЕЖЕННЯ</div><div class="cd px" id="saveCode6"></div><div style="font-size:12px;color:#CDB578;margin-top:6px">Запиши або сфотографуй: він поверне кімнату і зірки наступного разу.</div></div>'+
+'<button class="abtn gold" id="mapBtn6">На мапу сезону</button>'+
+'<button class="abtn" id="againBtn6">Пройти епізод ще раз, іншим маршрутом</button>';
+$("sciBtn6").onclick=function(){$("sciCard6").classList.toggle("hidden")};
+$("saveCode6").textContent=packCode();
+$("mapBtn6").onclick=goMap;
+$("againBtn6").onclick=startEp6;
+}
+
+function startEp7(){resetEp();S.ep=7;$("mProgBox").style.display="none";syncNameUI();
+S.sk={};S.rn=0;S.av=0;S.myF="";S.hadSick=false;
+S.pool=[0,1,2,3,4,5,6];
+for(var i=S.pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=S.pool[i];S.pool[i]=S.pool[j];S.pool[j]=t}
+$("map").style.display="none";$("mirror").style.display="none";
+$("hud").classList.remove("hidden");$("meta").classList.remove("hidden");$("game").classList.remove("hidden");
+setRoomMode("work");applyRoom();refresh();e7b0()}
+function e7b0(){
+setDay("ОСТАННІ ДВЕРІ");setCd("");setTime("m");
+say([
+{w:"n",t:"За дверима без назви виявляється звичайний понеділок. Кімната та сама, тиждень новий."},
+{w:"n",t:"Жодних плашок. Жодних підказок. Пʼять днів, зібраних власноруч."}
+],function(){
+revealFlame();setSignal(44);
+say([{w:"s",t:"Це я. Цього тижня я здебільшого мовчатиму: ти вже вмієш мене чути. Я просто поруч."}],function(){e7day(1)});
+});
+}
+function e7day(d){
+S.day=d;setTime("m");setRoomMode("work");
+setDay(D5[d]);setCd("ДЕНЬ "+d+" З 5");
+if(S.energy<10&&S.rhythm<15){e7dream();return}
+if(d===5&&S.av>=4){e7dream();return}
+if(S.sickPending){e7sick(d);return}
+if(d===5){e7fri();return}
+if(d===3){
+say([
+{w:"n",t:"Середа. Чай, підвіконня, місто внизу займається своїми справами."},
+{w:"s",t:"Знаєш, мені подобається, як ти тепер слухаєш. Навіть коли я мовчу."}
+],function(){e7run(d,1)});
+}else{e7run(d,2)}
+}
+function e7run(d,count){
+if(count<=0){evening(function(){e7day(d+1)});return}
+var idx=S.pool.pop();
+if(idx===undefined){evening(function(){e7day(d+1)});return}
+E7EV[idx](function(){e7run(d,count-1)});
+}
+var E7EV=[
+function(done){
+say([{w:"n",t:"Дзинь: Марта. «Дрібничка: заголовок на мобільній зʼїхав. Не горить.»"}],function(){
+actionsHTML(btn("Десять хвилин зараз","","","a1")+btn("Чесно: гляну в понеділок, ок?","","","a2")+btn("Потім","","","a3"));
+$("a1").onclick=function(){S.sk.micro=1;S.route.push("m7now");
+say([{w:"n",t:"Заголовок стає на місце ще до охолодження кави."}],done)};
+$("a2").onclick=function(){S.sk.boundary=1;S.route.push("m7bound");
+say([{w:"n",t:"Марта: «звісно, воно ж не горить». Межа, сказана вголос, важить."}],done)};
+$("a3").onclick=function(){S.av++;S.quiet+=2;S.route.push("m7later");
+say([{w:"n",t:"«Потім» тихо лягає на дно тижня."}],done)};
+});
+},
+function(done){
+say([{w:"n",t:"Стрічка підкидає гарний светр із мінус тридцять."}],function(){
+actionsHTML(btn("Цю суму в скарбничку","","","b1")+btn("Купити","","","b2"));
+$("b1").onclick=function(){S.sk.goal=1;S.route.push("goal7");
+say([{w:"n",t:"Дзвяк. Светр залишає по собі лише внесок."}],done)};
+$("b2").onclick=function(){S.route.push("buy7");
+say([{w:"n",t:"Светр їде. Гарний. Одна свідома покупка тиждень не ламає."}],done)};
+});
+},
+function(done){
+say([{w:"t",t:"«Цей тиждень тебе розчавить.»"}],function(){
+actionsHTML(btn("Пʼять днів, і кожен уже колись минав","","","c1")+btn("Мабуть","","","c2"));
+$("c1").onclick=function(){S.sk.shadow=1;S.route.push("shf");
+say([{w:"n",t:"Фраза блідне: короткі факти незручні для довгих вироків."}],done)};
+$("c2").onclick=function(){setSignal(S.signal+10);S.route.push("shc");
+say([{w:"n",t:"Фраза вмощується зручніше і замовляє чай."}],done)};
+});
+},
+function(done){
+say([{w:"n",t:"Макс: «пивний четвер? чи ти знову в дедлайнах»"}],function(){
+actionsHTML(btn("Сьогодні ввечері: так","","","d1")+btn("Потім, Макс","","","d2"));
+$("d1").onclick=function(){S.sk.bond=1;setSignal(S.signal-8);S.route.push("max7");
+say([{w:"n",t:"Вечір із Максом ставить тиждень на місце краще за будь-який план."}],done)};
+$("d2").onclick=function(){S.av++;S.route.push("later7");
+say([{w:"n",t:"Макс шле гіфку з сумним котом і чекає."}],done)};
+});
+},
+function(done){
+say([{w:"n",t:"Зранку за стіною прокидається перфоратор і не планує спати."}],function(){
+actionsHTML(btn("Прийняти: ноут у кафе","","","e1")+btn("Воювати за тишу вдома","","","e2"));
+$("e1").onclick=function(){S.sk.reframe=1;S.route.push("cafe");
+say([{w:"n",t:"Кутовий столик, чужий гул, свій фокус."}],done)};
+$("e2").onclick=function(){S.energy=clamp(S.energy-10);setSignal(S.signal+8);refresh();S.route.push("war7");
+say([{w:"n",t:"Перфоратор перемагає з рахунком три нуль."}],done)};
+});
+},
+function(done){
+say([{w:"n",t:"Оля: «а запишемо подкаст про той виступ? хвилин на сорок»"}],function(){
+actionsHTML(btn("Пауза до завтра","","","f1")+btn("Так, одразу","","","f2")+btn("Чесне ні","","","f3"));
+$("f1").onclick=function(){S.sk.reframe=1;S.route.push("pod0");
+say([{w:"n",t:"«Дай день подумати.» Оля: «легко». Пауза знову спрацьовує."}],done)};
+$("f2").onclick=function(){setSignal(S.signal+6);S.route.push("pod1");
+say([{w:"n",t:"«Так!» вилітає раніше за думку. Хоробро. Подивимось."}],done)};
+$("f3").onclick=function(){S.sk.boundary=1;S.route.push("pod2");
+say([{w:"n",t:"«Цього місяця ні, дякую.» Оля: «прийнято, повернусь пізніше»."}],done)};
+});
+},
+function(done){
+say([{w:"n",t:"Лист від орендодавиці: з наступного місяця плюс вісім відсотків."}],function(){
+actionsHTML(btn("Відкрити цифри зараз","","","g1")+btn("У понеділок","","","g2"));
+$("g1").onclick=function(){S.sk.goal=1;setSignal(S.signal-6);S.route.push("fin7");
+say([{w:"n",t:"Пʼятнадцять хвилин із таблицею: плюс вісім відсотків виявляються цифрою, а не прірвою."}],done)};
+$("g2").onclick=function(){S.av++;S.quiet+=2;S.route.push("finlater");
+say([{w:"n",t:"Лист лягає під інші листи і звідти гуде."}],done)};
+});
+}
+];
+function e7fri(){
+setDay("П'ЯТНИЦЯ");
+var seq=[{w:"n",t:"Пʼятниця добігає вечора. Тиждень, зібраний власноруч, лежить позаду: не ідеальний, зате твій."}];
+if(S.hadSick)seq.push({w:"n",t:"Один день забрало тіло, і це теж частина чесного тижня."});
+if(S.av>0)seq.push({w:"n",t:"Кілька «потім» ще чекають у понеділку. Вони вміють чекати."});
+say(seq,function(){
+say([{w:"s",t:"Останній ритуал сезону: твоя власна формула. Не з моїх, зі своїх."}],e7myform);
+});
+}
+function e7myform(){
+var M={q1:"роблю ранкову каву",q2:"всередині стає гучно",q3:"вечір закінчується",q4:"тягне сказати «потім»"};
+var A={z1:"один найменший крок",z2:"назвати факт уголос",z3:"три повільні дихання",z4:"цю суму в ціль"};
+var a=null,b=null;
+actionsHTML('<p class="grouplab px">МОМЕНТ</p>'+
+'<button class="chip" id="q1">Коли роблю ранкову каву</button>'+
+'<button class="chip" id="q2">Коли всередині гучно</button>'+
+'<button class="chip" id="q3">Коли вечір закінчується</button>'+
+'<button class="chip" id="q4">Коли тягне сказати «потім»</button>'+
+'<p class="grouplab px">ДІЯ</p>'+
+'<button class="chip" id="z1">Один найменший крок</button>'+
+'<button class="chip" id="z2">Назвати факт уголос</button>'+
+'<button class="chip" id="z3">Три повільні дихання</button>'+
+'<button class="chip" id="z4">Цю суму в ціль</button>'+
+'<div id="preview">Якщо <b>…</b>, то <b>…</b>.</div>'+
+btn("Перша сторінка блокнота","","gold","mf"));
+function paint(){
+["q1","q2","q3","q4"].forEach(function(i){$(i).classList.toggle("sel",a===i)});
+["z1","z2","z3","z4"].forEach(function(i){$(i).classList.toggle("sel",b===i)});
+$("preview").innerHTML="Якщо <b>"+(a?M[a]:"…")+"</b>, то <b>"+(b?A[b]:"…")+"</b>.";
+}
+paint();
+["q1","q2","q3","q4"].forEach(function(i){$(i).onclick=function(){a=i;paint()}});
+["z1","z2","z3","z4"].forEach(function(i){$(i).onclick=function(){b=i;paint()}});
+$("mf").onclick=function(){
+if(!a||!b){$("preview").innerHTML="Момент і дія. Твої.";return}
+S.myF="Якщо "+M[a]+", то "+A[b]+".";
+S.route.push("myform");
+say([{w:"s",t:"Записано твоєю рукою. Це і був іспит, і ти щойно поставив у ньому крапку."}],e7deadline);
+};
+}
+function e7deadline(){
+setCd("");
+var cnt=0;["micro","boundary","goal","shadow","bond","reframe"].forEach(function(k){if(S.sk[k])cnt++});
+if(S.rn>=3)cnt++;
+S.skCnt=cnt;
+if(cnt>=5&&S.av<=1){
+setDay("РІВНИЙ ТИЖДЕНЬ");
+say([{w:"s",t:"Пʼять днів без плашок, і жоден не згорів. Ти вів, я мовчав, і нам обом було спокійно."}],function(){mirror7("A1")});
+}else{
+setDay("ЖИВИЙ ТИЖДЕНЬ");
+say([{w:"s",t:"Тиждень вийшов живим: з латками, «потім» і чесними ремонтами. Живі тижні саме такі."}],function(){mirror7("A2")});
+}
+}
+function e7sick(d){
+S.sickPending=false;S.hadSick=true;S.route.push("sick");
+setRoomMode("bed");setDay(D5[d]+" · ЛІКАРНЯНИЙ");
+S.energy=clamp(S.energy+CFG.sickHeal);setSignal(S.signal-CFG.sickCalm);
+say([{w:"n",t:"Тіло бере день собі. Без переговорів."},
+{w:"s",t:"І це теж відповідь. Просто не твоя, а тіла."}],function(){
+setRoomMode("work");evening(function(){e7day(d+1)});
+});
+}
+function e7dream(){
+showFail("Тиждень розсипається на піксельний пісок: справи, обличчя і дні течуть крізь пальці.",e7wake);
+}
+function e7wake(){
+S.route.push("dream");
+setRoomMode("bed");setTime("m");setDay("П'ЯТНИЦЯ · РАНОК");setCd("ОСТАННІЙ ДЕНЬ");
+say([
+{w:"n",t:"Різкий вдих. Пʼятниця. Справжня, ціла, одна."},
+{w:"s",t:"Це був останній мій сон у сезоні. Далі покажеш ти. Я мовчу."}
+],e7naked1);
+}
+function e7naked1(){
+say([{w:"n",t:"Дзинь: Марта, дрібна правка."}],function(){
+actionsHTML(btn("Десять хвилин зараз","","","n1")+btn("Потім","","","n2"));
+$("n1").onclick=function(){S.sk.micro=1;S.route.push("nk1");say([{w:"n",t:"Зроблено."}],e7naked2)};
+$("n2").onclick=function(){S.av++;S.route.push("nk1b");say([{w:"n",t:"Потім."}],e7naked2)};
+});
+}
+function e7naked2(){
+say([{w:"t",t:"«Один день нічого не змінить.»"}],function(){
+actionsHTML(btn("Пʼятниця одна, і вона моя","","","n3")+btn("Мабуть","","","n4"));
+$("n3").onclick=function(){S.sk.shadow=1;S.route.push("nk2");say([{w:"n",t:"Фраза здувається."}],e7naked3)};
+$("n4").onclick=function(){S.route.push("nk2b");say([{w:"n",t:"Фраза сідає поруч."}],e7naked3)};
+});
+}
+function e7naked3(){
+say([{w:"n",t:"Вечір підходить тихо."}],function(){
+actionsHTML(btn("Розкласти речі на завтра","","","n5")+btn("Просто лягти","","","n6"));
+$("n5").onclick=function(){S.rn=(S.rn||0)+1;S.rhythm=clamp(S.rhythm+9);refresh();S.route.push("nk3");
+say([{w:"n",t:"Дві хвилини порядку. День зібрано. Не ідеально. Зібрано."}],e7myform)};
+$("n6").onclick=function(){S.route.push("nk3b");
+say([{w:"n",t:"Ковдра. Тиша. День зібрано. Не ідеально. Зібрано."}],e7myform)};
+});
+}
+function mirror7(tier){
+setDay("СЕЗОН · ЗАВЕРШЕНО");setCd("");G.eps[6]=true;applyRoom();
+var names={m7now:"дрібничка одразу",m7bound:"сказана межа",m7later:"«потім» Марті",goal7:"сума в ціль",buy7:"свідомий светр",shf:"факт критику",shc:"згода з тінню",max7:"вечір із Максом",later7:"«потім» Максу",cafe:"фокус у кафе",war7:"війна з перфоратором",pod0:"пауза для Олі",pod1:"так без паузи",pod2:"чесне ні",fin7:"цифри одразу",finlater:"лист під листами",sick:"день тіла",dream:"сон-попередження",myform:"власна формула",nk1:"крок",nk1b:"потім",nk2:"факт",nk2b:"мабуть",nk3:"дві хвилини порядку",nk3b:"ковдра"};
+var path=S.route.map(function(r){return names[r]||r}).join(" → ");
+var ends={A1:{t:"РІВНИЙ ТИЖДЕНЬ",d:"Пʼять днів без підказок, зібраних власноруч. Сигнал звучав, ти відповідав, і тиждень стояв рівно."},
+A2:{t:"ЖИВИЙ ТИЖДЕНЬ З ЛАТКАМИ",d:"З «потім», ремонтами і чесними швами. Живі тижні саме такі, і вони тримаються."},
+F:{t:"ДЕНЬ ПІСЛЯ СНУ",d:"Сон розсипав тиждень на пісок. Один справжній день, зібраний мовчки, склеїв його назад."}};
+var SKL=[["Факт у відповідь критику","shadow"],["Найменший крок за формулою","micro"],["Вечірній ритм","rn"],["Сказана межа","boundary"],["Переоцінка і пауза","reframe"],["Суми в ціль і чесні цифри","goal"],["Бути поруч","bond"]];
+var skRows="";
+SKL.forEach(function(p){
+var ok=p[1]==="rn"?(S.rn>=3):!!S.sk[p[1]];
+skRows+='<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0"><span>'+p[0]+'</span><span style="color:'+(ok?"var(--gold)":"var(--dim)")+'">'+(ok?"★":"·")+'</span></div>';
+});
+var FORMS=["Якщо момент настає, то мікрокрок стається (еп1)","Якщо кортить купити, то пауза на добу (еп2)","Якщо тиша лякає, то одне чесне речення (еп3)","Якщо чую «завжди», то один факт у відповідь (еп4)","Якщо беру нове, то спершу бюджет енергії (еп5)","Якщо страшно почати, то перший слайд уголос (еп6)"];
+var formRows="";FORMS.forEach(function(f){formRows+='<div style="padding:2px 0;color:var(--mist)">'+f+'</div>'});
+formRows+='<div style="padding:6px 0 0;color:var(--gold)">'+esc(S.myF||"")+' (твоя)</div>';
+$("game").classList.add("hidden");
+var m=$("mirror");
+m.style.display="flex";
+m.innerHTML=
+'<h2 class="px">ДЗЕРКАЛО СЕЗОНУ</h2>'+
+'<div class="mcard end"><div class="cap px">ФІНАЛ</div><div class="big px">'+ends[tier].t+'</div><div style="margin-top:8px">'+ends[tier].d+'</div></div>'+
+'<div class="mcard"><div class="cap px">ОСТАННІЙ ТИЖДЕНЬ</div>'+esc(path)+'.</div>'+
+'<div class="mcard"><div class="cap px">НАВИЧКИ СЕЗОНУ · '+S.skCnt+' З 7 У ДІЇ</div>'+skRows+'</div>'+
+'<div class="mcard"><div class="cap px">БЛОКНОТ ФОРМУЛ</div>'+formRows+'</div>'+
+'<div class="mcard"><div class="cap px">МОДЕЛЬ ПІД КАПОТОМ · КАРТКА 7 З 7</div>'+
+'Уся гра стоїть на одній схемі з дослідження 314 українців 18-29 років: ЧУТЛИВІСТЬ (як голосно вмикається Сигнал) → СПОСІБ ВІДПОВІДІ (те, що обираєш ти) → СТАН (скільки напруги осідає). Три числа сезону: маршрут через уникання пояснює приблизно третину шляху від чутливості до виснаження; за міцного щоденного ритму чутливість конвертується в напругу майже вдвічі слабше; найміцніший місток до виснаження це самозвинувачення. Чутливість не вимикається кнопкою, і не мусить: долю сигналу вирішує відповідь.</div>'+
+'<div class="mcard"><div class="cap px">ТИТРИ</div>У ролях: Сигнал · '+esc(S.name)+' · Марта з Торонто · Макс · Оля · мама · і тінь, яка стала тінню.<br><br>Ідея, дослідження і гра: yane.pcho.<br><br>Наукова основа: дисертаційне дослідження психологічних механізмів подолання стресу в молоді (Україна, N = 314, 18-29 років).<br><br>Дякуємо, що дійшли до останніх дверей. Сигнал лишається з тобою: тихий, чесний, твій.</div>'+
+'<div class="mcard safe">Якщо напруга чи пригніченість не слабшають понад два тижні, ламаються сон або щоденні справи, чи зʼявляються думки про самоушкодження: це привід звернутись до фахівця. Телефон довіри 7333, цілодобово. Екстрена допомога 112.</div>'+
+'<div class="codecard"><div class="cap px" style="color:var(--mist)">ФІНАЛЬНИЙ КОД</div><div class="cd px" id="saveCode7"></div><div style="font-size:12px;color:#CDB578;margin-top:6px">Сім зірок, кімната і всі двері: він поверне все.</div></div>'+
+'<button class="abtn gold" id="mapBtn7">На мапу сезону</button>'+
+'<button class="abtn" id="againBtn7">Прожити останній тиждень інакше</button>';
+$("saveCode7").textContent=packCode();
+$("mapBtn7").onclick=goMap;
+$("againBtn7").onclick=startEp7;
+}
+</script>
+</body>
+</html>
