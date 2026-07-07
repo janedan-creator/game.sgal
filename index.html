@@ -25,10 +25,10 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--night);color:var(--cream);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center}
-#wrap{width:100%;max-width:430px;min-height:100%;display:flex;flex-direction:column;background:var(--night)}
+body{background:var(--night);color:var(--cream);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;touch-action:manipulation}
+#wrap{width:100%;max-width:430px;min-height:100%;min-height:100svh;display:flex;flex-direction:column;background:var(--night)}
 .px{font-family:'Press Start 2P','Courier New',monospace}
-button{font-family:inherit;cursor:pointer}
+button{font-family:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 
 #hud{display:flex;align-items:center;gap:8px;padding:10px 12px 8px;border-bottom:3px solid var(--line);background:var(--deep)}
@@ -55,14 +55,14 @@ button{font-family:inherit;cursor:pointer}
 .fB{animation:fk .9s steps(1) -.45s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 
-#dialog{margin:10px 12px;background:var(--panel);border:3px solid var(--line);box-shadow:0 4px 0 var(--line);padding:12px 14px;min-height:96px;position:relative}
+#dialog{margin:10px 12px;background:var(--panel);border:3px solid var(--line);box-shadow:0 4px 0 var(--line);padding:12px 14px;min-height:96px;position:relative;-webkit-user-select:none;user-select:none}
 #spk{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:1px;margin-bottom:8px;color:var(--mist)}
 #spk .flameDot{width:10px;height:10px;background:var(--ember);border:2px solid var(--line)}
 #spk.s{color:var(--gold)}
 #txt{font-size:15.5px;line-height:1.6;min-height:48px}
 #cue{position:absolute;right:12px;bottom:8px;color:var(--gold);animation:fk 1s steps(1) infinite}
 
-#actions{padding:4px 12px 20px;display:flex;flex-direction:column;gap:10px}
+#actions{padding:4px 12px 20px;display:flex;flex-direction:column;gap:10px;min-height:190px}
 .abtn{display:block;width:100%;text-align:left;background:var(--panel);color:var(--cream);border:3px solid var(--line);box-shadow:0 4px 0 var(--line);padding:12px 14px;font-size:15px}
 .abtn small{display:block;color:var(--mist);font-size:12.5px;margin-top:3px;font-weight:400}
 .abtn:active{transform:translateY(4px);box-shadow:none}
@@ -179,7 +179,7 @@ button{font-family:inherit;cursor:pointer}
     <label class="px">ХТО ТВІЙ ГЕРОЙ?</label>
     <div class="itemrow"><button class="chip" id="nOr">Орися</button><button class="chip sel" id="nSl">Слава</button><button class="chip" id="nTa">Тарас</button></div>
   </div>
-  <button class="abtn" id="haveCode">У мене є код</button>
+  <button class="abtn" id="haveCode">У мене є код з минулого разу</button>
   <div id="codeRow" class="hidden"><input id="codeIn" maxlength="12" placeholder="ДІМ-#####" autocomplete="off"><button class="abtn gold" id="codeGo">Ок</button></div>
   <p id="codeMsg" class="hintline" style="min-height:14px;margin:0"></p>
   <button class="abtn gold" id="startBtn">Почати епізод 1</button>
@@ -468,7 +468,7 @@ if(mode==="bed")$("plantG").classList.add("hiddenF");else $("plantG").classList.
 }
 
 var dq=[],dcb=null,typing=false,ti=null,full="";
-function say(lines,cb){dq=lines.slice();dcb=cb;$("actions").innerHTML="";nextLine()}
+function say(lines,cb){dq=lines.slice();dcb=cb;$("dialog").style.minHeight="";$("actions").innerHTML="";nextLine()}
 function nextLine(){
 if(typing){clearInterval(ti);typing=false;$("txt").textContent=full;$("cue").classList.remove("hidden");return}
 if(!dq.length){$("cue").classList.add("hidden");if(dcb){var c=dcb;dcb=null;c()}return}
@@ -481,7 +481,10 @@ else if(w==="h"){s.className="";s.innerHTML='<span class="px">'+esc(S.name.toUpp
 else{s.className="";s.innerHTML='<span class="px">···</span>'}
 }
 function esc(t){return t.replace(/[<>&]/g,function(c){return c==="<"?"&lt;":c===">"?"&gt;":"&amp;"})}
-function typeText(t){full=t;$("txt").textContent="";$("cue").classList.add("hidden");typing=true;var i=0;
+function typeText(t){full=t;
+var tx=$("txt");tx.textContent=full;
+$("dialog").style.minHeight=Math.max(96,$("dialog").offsetHeight)+"px";
+tx.textContent="";$("cue").classList.add("hidden");typing=true;var i=0;
 ti=setInterval(function(){i+=2;$("txt").textContent=full.slice(0,i);
 if(i>=full.length){clearInterval(ti);typing=false;$("cue").classList.remove("hidden")}},18)}
 $("dialog").addEventListener("click",nextLine);
